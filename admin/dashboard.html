@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>KPS Admin Dashboard</title>
+		<link rel="icon" type="image/png" href="/assets/kps/favicon.png" />
+		<link rel="stylesheet" href="/css/styles.css" />
+	</head>
+	<body class="admin-body">
+		<div class="admin-layout">
+			<!-- Sidebar -->
+			<aside class="admin-sidebar">
+				<div class="admin-brand">
+					<img src="/assets/kps/kps_logo.png" alt="Kids PlaySafer" class="admin-brand-logo" />
+					<div class="admin-brand-title">KPS Admin</div>
+				</div>
+
+				<nav class="admin-nav">
+					<a id="analytics-link" href="https://console.firebase.google.com" target="_blank" rel="noopener" class="admin-nav-item">Analytics</a>
+					<a href="/admin/dashboard.html" class="admin-nav-item admin-nav-item-active">Survey</a>
+				</nav>
+
+				<button type="button" id="signout-btn" class="admin-signout">Sign Out</button>
+			</aside>
+
+			<!-- Main content -->
+			<main class="admin-main">
+				<div class="admin-page-header">
+					<div>
+						<h1 class="admin-page-title">Survey Responses</h1>
+						<p class="admin-page-stat"><strong>Total Completions:</strong> <span id="total-completions">—</span></p>
+						<p class="admin-page-stat"><strong>Total Surveys:</strong> <span id="total-surveys">—</span></p>
+					</div>
+					<div class="admin-page-actions">
+						<button type="button" id="export-btn" class="kps-btn kps-btn-success">Export All (.xlsx)</button>
+						<button type="button" id="refresh-btn" class="kps-btn kps-btn-secondary">Refresh</button>
+					</div>
+				</div>
+
+				<div class="admin-data-card" id="survey-container">
+					<p class="kps-info admin-empty">Loading...</p>
+				</div>
+
+				<div class="admin-pagination">
+					<button type="button" id="prev-btn" class="kps-btn kps-btn-secondary" disabled>← Prev</button>
+					<span class="admin-page-num">Page <span id="page-num">1</span></span>
+					<button type="button" id="next-btn" class="kps-btn kps-btn-secondary" disabled>Next →</button>
+				</div>
+			</main>
+		</div>
+
+		<script type="module" src="/js/pages/admin/dashboard.js"></script>
+	</body>
+</html>
