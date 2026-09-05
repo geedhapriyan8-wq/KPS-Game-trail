@@ -1,0 +1,14 @@
+# Firebase project files (still used for Firestore/Auth, not for hosting)
+firebase.json
+.firebaserc
+firestore.rules
+.firebase/
+
+# Source / demo material, not part of the deployed site
+extracted/
+
+# Misc
+README.md
+.vscode/
+.DS_Store
+*.log
