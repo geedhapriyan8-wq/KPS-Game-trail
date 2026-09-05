@@ -10,6 +10,7 @@ A starter template for Kids PlaySafer educational web apps and games — powered
 - [Working with the database](#working-with-the-database)
 - [Analytics](#analytics)
 - [Building your game](#building-your-game)
+- [The scam quiz game (senior edition)](#the-scam-quiz-game-senior-edition)
 - [Common snippets](#common-snippets)
 - [Deploying](#deploying)
 - [Admin: one-time project setup](#admin-one-time-project-setup)
@@ -189,6 +190,191 @@ The shared kid account means **every kid appears as the same Firebase user**. Do
 
 ---
 
+## The scam quiz game (senior edition)
+
+This template's `/game/` page is currently built out as a multiple-choice
+scam-awareness quiz for seniors, covering Singapore-specific scam patterns.
+This section documents how it works so the next developer can extend it
+without having to reverse-engineer it.
+
+### File map
+
+| File | What it's for |
+|---|---|
+| `js/pages/game/questions.js` | The question bank: all scenarios, the `CATEGORIES` map, and `getRandomQuiz()` which builds one randomized playthrough. **This is the file you edit to add/change questions or categories.** |
+| `js/pages/game/index.js` | Quiz engine: renders one question at a time, scores answers, fires analytics, saves the completion doc, then hands off to the existing survey. You shouldn't need to touch this to add content — only if you're changing *how* the quiz behaves. |
+| `game/index.html` | The quiz/result card markup (`#quiz-screen`, `#quiz-result`) plus the existing survey `<template>`. |
+| `css/styles.css` | `.kps-quiz-option`, `.kps-quiz-card`, `.kps-category-icon`, `#quiz-progress`, and the `.screen-game` background rules. |
+| `assets/kps/quiz-bg-tile.png` | The repeating mascot-sticker background tile behind the game screen. |
+| `assets/kps/categories/*.png` | Full-opacity category mascot art (love, impersonation, investment, ecommerce), cropped from the original card illustrations. Used both to build the background tile and as the small icon shown next to the category name during play. |
+
+### Question bank & categories
+
+Each question in `QUESTIONS` (in `questions.js`) looks like:
+
+```javascript
+{
+  category: 'impersonation',       // must match a key in CATEGORIES
+  scenario: 'The situation...',
+  options: ['choice A', 'choice B', 'choice C', 'choice D'],
+  correctIndex: 1,                 // index into options[]
+  explanation: 'Why that answer is right — shown after the player answers',
+}
+```
+
+`CATEGORIES` maps each category key to a display label, emoji, and
+(optionally) an icon image path:
+
+```javascript
+export const CATEGORIES = {
+  impersonation: { label: 'Impersonation', emoji: '🎭', icon: '/assets/kps/categories/impersonation.png' },
+  blessing:      { label: 'Blessing Scam', emoji: '🙏', icon: null }, // no artwork yet — falls back to emoji only
+  ...
+};
+```
+
+**To add a new scam category:** add an entry to `CATEGORIES`, then add
+questions with that `category` key to `QUESTIONS`. If you have mascot
+artwork for it, drop the PNG in `assets/kps/categories/` and point `icon`
+at it — no other code changes needed. If you don't have art yet, leave
+`icon: null` and the quiz will just show the emoji + label.
+
+**To add more questions to an existing category:** just push more objects
+into `QUESTIONS` with that `category`. Nothing else needs to change.
+
+### Randomization
+
+`getRandomQuiz(perCategory = 2)` (bottom of `questions.js`) builds one
+quiz playthrough:
+
+1. Groups all questions by category.
+2. Shuffles each category's pool independently (Fisher–Yates) and takes up
+   to `perCategory` from each — so every playthrough still covers every
+   scam type, it's just *which* questions and in *what order* that varies.
+3. Shuffles the combined list so categories don't always appear in the
+   same sequence.
+
+`index.js` calls this once per page load (`const quizQuestions = getRandomQuiz();`).
+As the question bank grows, this automatically starts drawing from a
+bigger pool — you don't need to change the randomization logic.
+
+### Analytics
+
+Two events fire during the quiz (see `EVENTS` in `js/constants.js`):
+
+- **`EVENTS.QUESTION_ANSWERED`** — fires on every answer, with
+  `{ questionIndex, category, correct, selectedIndex }`. Use this to see
+  which categories (or specific scenarios) trip people up most often.
+- **`EVENTS.GAME_COMPLETED`** — fires once at the end, with
+  `{ source: 'scam_scenario_quiz', score, total }`.
+
+The `completions` doc saved at the end also stores a `categoryStats`
+object for convenience, so you don't have to reconstruct it from raw
+events:
+
+```javascript
+{
+  source: 'scam_scenario_quiz',
+  score: 7,
+  total: 10,
+  durationMs: 143201,
+  categoryStats: {
+    impersonation: { correct: 2, total: 2 },
+    blessing:      { correct: 1, total: 2 },
+    love:          { correct: 2, total: 2 },
+    investment:    { correct: 1, total: 2 },
+    ecommerce:     { correct: 1, total: 2 },
+  },
+}
+```
+
+This is exactly the shape you'd want for an admin dashboard chart of
+"average score by scam category" — query `completions` and aggregate
+`categoryStats` client-side, no schema change needed.
+
+### Background art (the mascot tile)
+
+`.screen-game` layers two backgrounds:
+
+1. `assets/kps/quiz-bg-tile.png` — a repeating tile of the category mascots
+   at partial opacity plus a few sparkle accents, arranged off-grid so it
+   reads as scattered stickers rather than a rigid pattern.
+2. A fixed (non-scrolling, non-repeating) diagonal brand-color gradient
+   behind it, so the backdrop has color and depth even in the gaps between
+   mascots.
+
+Both are declared together in the `background-image` / `background-size`
+/ `background-repeat` / `background-attachment` shorthand properties on
+`.screen-game` in `css/styles.css` — each property takes two comma-separated
+values, one per layer, in the same order.
+
+**To regenerate the tile** (e.g. with new or updated mascot art): the tile
+was built with a short Python/Pillow script that crops each card's
+illustration, scales/rotates copies of it, composites them onto a
+transparent canvas at partial opacity, and draws a few star accents on
+top. If you're changing the artwork, the fastest path is redoing that
+composite (any image editor or a similar script works) and overwriting
+`assets/kps/quiz-bg-tile.png` — the CSS doesn't need to change unless you
+change the tile's aspect ratio.
+
+The tile's `background-size` uses `clamp()` so the pattern scales down on
+phones and up on laptops instead of staying a fixed pixel size — see
+**Responsive design** below.
+
+### Responsive design (phone / tablet / laptop)
+
+- `.kps-quiz-card` (applied to both `#quiz-screen` and `#quiz-result`, in
+  addition to `.kps-card`) caps the quiz card's width at 460px on phones,
+  600px from 700px viewport width up, and 680px from 1100px up (see the
+  `@media (min-width: 700px)` / `@media (min-width: 1100px)` rules in
+  `css/styles.css`). This is separate from the 460px cap used by the
+  passcode/admin login cards, which are intentionally left compact.
+- The scenario heading, answer-option text, and progress line use
+  `clamp(min, preferred, max)` font sizes instead of fixed `rem` values,
+  so text scales smoothly across screen sizes instead of jumping at
+  breakpoints.
+- The background tile's `background-size` also uses `clamp()` (in `vw`
+  units) so the mascot pattern's density looks right on both a phone and
+  a laptop screen instead of being a fixed pixel size that looks
+  oversized on small screens or sparse on large ones.
+- `.game-area` has `align-items: center`, so the quiz card stays centered
+  at every viewport width rather than only looking centered by
+  coincidence at one width.
+
+If you add new elements to the quiz card, prefer `clamp()` over fixed
+`rem`/`px` sizes for anything text-related, and test at roughly 375px
+(phone), 820px (tablet), and 1440px (laptop) widths.
+
+### A CSS gotcha worth knowing: `[hidden]` vs. `display`
+
+The template hides/shows elements with the native `hidden` attribute
+(`element.hidden = true` in JS, or a static `hidden` attribute in HTML).
+By default the browser hides anything with `hidden` — **but only if no
+other CSS rule on that element also sets `display`.** Several classes in
+this template do (`.kps-btn` sets `display: inline-flex`, `.kps-card`
+sets `display: flex`), and those rules override the browser's default
+`[hidden]` behavior because both are "author" styles of equal
+specificity, and the later one in the stylesheet wins.
+
+This was previously a real bug here: the "Next" button and the results
+card were both visible from the very first question, because `.kps-btn`
+and `.kps-card` silently cancelled out their `hidden` attributes.
+
+The fix is one rule near the top of `css/styles.css`:
+
+```css
+[hidden] {
+  display: none !important;
+}
+```
+
+**Don't remove this rule.** If you ever add a new element that should be
+hidden/shown via the `hidden` attribute and it doesn't seem to work,
+check whether some other class on it also sets `display` — that's almost
+certainly why, and this rule is what's supposed to prevent it.
+
+---
+
 ## Common snippets
 
 Copy-paste starting points for the things you'll do most.
@@ -362,17 +548,22 @@ kps-project-template/
 │   └── pages/              ← one JS file per HTML page (mirrors HTML layout)
 │       ├── index.js        ← drives index.html
 │       ├── game/
-│       │   └── index.js    ← drives game/index.html (edit for your game)
+│       │   ├── index.js     ← quiz engine — drives game/index.html
+│       │   └── questions.js ← question bank + CATEGORIES + getRandomQuiz() — edit this to add content
 │       └── admin/
 │           ├── index.js    ← drives admin/index.html
 │           └── dashboard.js ← drives admin/dashboard.html
 ├── assets/kps/             ← logo + favicon
+│   ├── quiz-bg-tile.png    ← repeating mascot background tile for the game screen
+│   └── categories/         ← full-opacity category mascot art (love, impersonation, investment, ecommerce)
 ├── firestore.rules         ← Firestore access rules (read this!)
 ├── firebase.json           ← hosting + Firestore config (used at deploy)
 └── .firebaserc             ← Firebase project ID
 ```
 
 **One feature, one folder.** To change the game UI, you edit `game/index.html` and `js/pages/game/index.js`. Same for admin. No router, no hidden sections, no template literals.
+
+See [The scam quiz game (senior edition)](#the-scam-quiz-game-senior-edition) above for how the current quiz content, randomization, analytics, background art, and responsive sizing fit together.
 
 ---
 
