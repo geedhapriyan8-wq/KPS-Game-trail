@@ -22,10 +22,11 @@
  */
 
 export const CATEGORIES = {
-  impersonation: { label: 'Impersonation', emoji: '🎭' },
-  blessing: { label: 'Blessing Scam', emoji: '🙏' },
-  love: { label: 'Love Scam', emoji: '💕' },
-  investment: { label: 'Investment Scam', emoji: '📈' },
+  impersonation: { label: 'Impersonation', emoji: '🎭', icon: '/assets/kps/categories/impersonation.png' },
+  blessing: { label: 'Blessing Scam', emoji: '🙏', icon: null },
+  love: { label: 'Love Scam', emoji: '💕', icon: '/assets/kps/categories/love.png' },
+  investment: { label: 'Investment Scam', emoji: '📈', icon: '/assets/kps/categories/investment.png' },
+  ecommerce: { label: 'E-commerce Scam', emoji: '🛍️', icon: '/assets/kps/categories/ecommerce.png' },
 };
 
 export const QUESTIONS = [
@@ -141,4 +142,69 @@ export const QUESTIONS = [
     explanation:
       'Fake celebrity endorsements and apps that ask you to "top up" before you can withdraw your own profits are hallmark signs of an investment scam. Check the MAS Financial Institutions Directory before investing anywhere.',
   },
+  {
+    category: 'ecommerce',
+    scenario:
+      'You find a brand-new air fryer on Carousell for half the usual price. The seller has no reviews yet and asks you to PayNow the full amount to a personal mobile number before shipping, with no option to pay on delivery.',
+    options: [
+      'Pay in full by PayNow since the price is so good',
+      'Be wary of no-review sellers who only accept upfront PayNow with no buyer protection, and consider a platform with delivery-on-payment or escrow instead',
+      'Ask the seller to lower the price further before paying',
+      'Pay half first, half after delivery, without checking the seller further',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Deep discounts, no reviews, and insisting on upfront PayNow to a personal number are common e-commerce scam signs. Prefer platforms with buyer protection and be cautious of sellers who avoid any pay-on-delivery option.',
+  },
+  {
+    category: 'ecommerce',
+    scenario:
+      'A Facebook ad shows a well-known electronics brand having a "warehouse clearance sale" at 80% off, linking to a site that looks slightly different from the brand\u2019s real website and only accepts bank transfer.',
+    options: [
+      'Buy quickly before the "sale" ends',
+      'Check the web address carefully against the brand\u2019s official site, and avoid paying by bank transfer to an unfamiliar site',
+      'Transfer a small deposit first to test if the item arrives',
+      'Share the link with friends so they can buy too, then decide',
+    ],
+    correctIndex: 1,
+    explanation:
+      'Fake "clearance sale" ads with look-alike web addresses and bank-transfer-only payment are a common e-commerce scam. Always check the URL carefully and prefer secure payment methods with buyer protection.',
+  },
 ];
+
+/**
+ * Fisher-Yates shuffle — returns a new shuffled array, doesn't mutate the input.
+ */
+function shuffle(array) {
+  const result = [...array];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
+/**
+ * Builds one random quiz run from the question bank.
+ *
+ * Pulls up to `perCategory` random questions from EACH category (so every
+ * playthrough still covers all scam types, not just whichever happens to
+ * get picked), then shuffles the final question order so the categories
+ * don't always appear in the same sequence.
+ *
+ * As you add more questions to QUESTIONS above, this automatically starts
+ * drawing from a bigger pool — nothing here needs to change.
+ */
+export function getRandomQuiz(perCategory = 2) {
+  const byCategory = {};
+  QUESTIONS.forEach((q) => {
+    if (!byCategory[q.category]) byCategory[q.category] = [];
+    byCategory[q.category].push(q);
+  });
+
+  const picked = Object.keys(byCategory).flatMap((cat) =>
+    shuffle(byCategory[cat]).slice(0, perCategory)
+  );
+
+  return shuffle(picked);
+}

@@ -15,7 +15,7 @@ import { signOutUser, isPasscodeUser, isAdmin } from '../../firebase/auth.js';
 import { dbHelpers } from '../../firebase/db.js';
 import { logKpsEvent } from '../../firebase/analytics.js';
 import { COLLECTIONS, EVENTS } from '../../constants.js';
-import { QUESTIONS, CATEGORIES } from './questions.js';
+import { CATEGORIES, getRandomQuiz } from './questions.js';
 
 await auth.authStateReady();
 const user = auth.currentUser;
@@ -51,6 +51,11 @@ function initGame() {
   let score = 0;
   const startedAt = Date.now();
 
+  // A new random draw from the question bank every time the game loads —
+  // covers every category, but the specific questions and their order
+  // change from playthrough to playthrough.
+  const quizQuestions = getRandomQuiz();
+
   // Per-category tallies, e.g. { impersonation: { correct: 1, total: 2 }, ... }
   const categoryStats = {};
   Object.keys(CATEGORIES).forEach((key) => {
@@ -60,10 +65,21 @@ function initGame() {
   renderQuestion();
 
   function renderQuestion() {
-    const q = QUESTIONS[current];
+    const q = quizQuestions[current];
     const cat = CATEGORIES[q.category];
-    progressEl.textContent =
-      `${cat ? cat.emoji + ' ' + cat.label : ''} — Question ${current + 1} of ${QUESTIONS.length}`;
+    progressEl.innerHTML = '';
+    if (cat?.icon) {
+      const icon = document.createElement('img');
+      icon.src = cat.icon;
+      icon.alt = cat.label;
+      icon.className = 'kps-category-icon';
+      progressEl.appendChild(icon);
+    }
+    progressEl.appendChild(
+      document.createTextNode(
+        `${cat ? cat.emoji + ' ' + cat.label : ''} — Question ${current + 1} of ${quizQuestions.length}`
+      )
+    );
     scenarioEl.textContent = q.scenario;
     feedbackEl.hidden = true;
     nextBtn.hidden = true;
@@ -80,7 +96,7 @@ function initGame() {
   }
 
   function selectAnswer(index, btn) {
-    const q = QUESTIONS[current];
+    const q = quizQuestions[current];
     const isCorrect = index === q.correctIndex;
     if (isCorrect) score++;
 
@@ -108,12 +124,12 @@ function initGame() {
     feedbackEl.textContent = (isCorrect ? 'Correct! ' : 'Not quite. ') + q.explanation;
     feedbackEl.hidden = false;
     nextBtn.hidden = false;
-    nextBtn.textContent = current < QUESTIONS.length - 1 ? 'Next question' : 'See results';
+    nextBtn.textContent = current < quizQuestions.length - 1 ? 'Next question' : 'See results';
   }
 
   nextBtn.addEventListener('click', async () => {
     current++;
-    if (current < QUESTIONS.length) {
+    if (current < quizQuestions.length) {
       renderQuestion();
     } else {
       await finishQuiz();
@@ -123,17 +139,17 @@ function initGame() {
   async function finishQuiz() {
     quizScreen.hidden = true;
     resultScreen.hidden = false;
-    scoreEl.textContent = `You scored ${score} out of ${QUESTIONS.length}.`;
+    scoreEl.textContent = `You scored ${score} out of ${quizQuestions.length}.`;
 
     try {
       await dbHelpers.add(COLLECTIONS.COMPLETIONS, {
         source: 'scam_scenario_quiz',
         score,
-        total: QUESTIONS.length,
+        total: quizQuestions.length,
         durationMs: Date.now() - startedAt,
         categoryStats,
       });
-      logKpsEvent(EVENTS.GAME_COMPLETED, { source: 'scam_scenario_quiz', score, total: QUESTIONS.length });
+      logKpsEvent(EVENTS.GAME_COMPLETED, { source: 'scam_scenario_quiz', score, total: quizQuestions.length });
       status.textContent = 'Completion recorded!';
       status.hidden = false;
       mountSurvey(surveyMount);

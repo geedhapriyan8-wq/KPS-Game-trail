@@ -58,6 +58,9 @@ code {
   align-items: stretch;
   display: block;
   padding: 0;
+  background-image: url('/assets/kps/quiz-bg-tile.png');
+  background-repeat: repeat;
+  background-size: 230px 210px;
 }
 
 /* ── Card (passcode / admin) ─────────────────── */
@@ -166,6 +169,19 @@ code {
 .kps-btn-success:hover:not(:disabled) { background: #15803d; }
 
 /* ── Quiz options ───────────────────────────── */
+#quiz-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.kps-category-icon {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
 .kps-quiz-options {
   display: flex;
   flex-direction: column;
