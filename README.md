@@ -11,6 +11,7 @@ A starter template for Kids PlaySafer educational web apps and games — powered
 - [Analytics](#analytics)
 - [Building your game](#building-your-game)
 - [The scam quiz game (senior edition)](#the-scam-quiz-game-senior-edition)
+- [Design system](#design-system)
 - [Common snippets](#common-snippets)
 - [Deploying](#deploying)
 - [Admin: one-time project setup](#admin-one-time-project-setup)
@@ -204,7 +205,7 @@ without having to reverse-engineer it.
 | `js/pages/game/questions.js` | The question bank: all scenarios, the `CATEGORIES` map, and `getRandomQuiz()` which builds one randomized playthrough. **This is the file you edit to add/change questions or categories.** |
 | `js/pages/game/index.js` | Quiz engine: renders one question at a time, scores answers, fires analytics, saves the completion doc, then hands off to the existing survey. You shouldn't need to touch this to add content — only if you're changing *how* the quiz behaves. |
 | `game/index.html` | The quiz/result card markup (`#quiz-screen`, `#quiz-result`) plus the existing survey `<template>`. |
-| `css/styles.css` | `.kps-quiz-option`, `.kps-quiz-card`, `.kps-category-icon`, `#quiz-progress`, and the `.screen-game` background rules. |
+| `css/styles.css` | `.kps-quiz-option`, `.kps-quiz-card`, `.kps-quiz-meta` / `.kps-category-badge` / `.kps-quiz-counter` / `.kps-progress-track` / `.kps-progress-fill`, and the `.screen-game` background rules. |
 | `assets/kps/quiz-bg-tile.png` | The repeating mascot-sticker background tile behind the game screen. |
 | `assets/kps/categories/*.png` | Full-opacity category mascot art (love, impersonation, investment, ecommerce), cropped from the original card illustrations. Used both to build the background tile and as the small icon shown next to the category name during play. |
 
@@ -222,22 +223,37 @@ Each question in `QUESTIONS` (in `questions.js`) looks like:
 }
 ```
 
-`CATEGORIES` maps each category key to a display label, emoji, and
-(optionally) an icon image path:
+`CATEGORIES` maps each category key to a display label, emoji, optional
+icon image path, and the two colors used to theme its badge (see
+[Category badge & progress bar](#category-badge--progress-bar) below):
 
 ```javascript
 export const CATEGORIES = {
-  impersonation: { label: 'Impersonation', emoji: '🎭', icon: '/assets/kps/categories/impersonation.png' },
-  blessing:      { label: 'Blessing Scam', emoji: '🙏', icon: null }, // no artwork yet — falls back to emoji only
+  impersonation: {
+    label: 'Impersonation',
+    emoji: '🎭',
+    icon: '/assets/kps/categories/impersonation.png',
+    color: '#dbeafe',       // pastel badge background
+    colorDark: '#1d4ed8',   // matching badge text color
+  },
+  blessing: {
+    label: 'Blessing Scam',
+    emoji: '🙏',
+    icon: null,             // no artwork yet — badge falls back to the emoji
+    color: '#ede9fe',
+    colorDark: '#6d28d9',
+  },
   ...
 };
 ```
 
-**To add a new scam category:** add an entry to `CATEGORIES`, then add
-questions with that `category` key to `QUESTIONS`. If you have mascot
-artwork for it, drop the PNG in `assets/kps/categories/` and point `icon`
-at it — no other code changes needed. If you don't have art yet, leave
-`icon: null` and the quiz will just show the emoji + label.
+**To add a new scam category:** add an entry to `CATEGORIES` with a
+`label`, `emoji`, `color`, and `colorDark`. If you have mascot artwork for
+it, drop the PNG in `assets/kps/categories/` and point `icon` at it —
+otherwise leave `icon: null` and the badge shows the emoji instead. Then
+add questions with that `category` key to `QUESTIONS`. No other code
+changes needed — the badge picks up the new colors and icon/emoji
+automatically.
 
 **To add more questions to an existing category:** just push more objects
 into `QUESTIONS` with that `category`. Nothing else needs to change.
@@ -257,6 +273,40 @@ quiz playthrough:
 `index.js` calls this once per page load (`const quizQuestions = getRandomQuiz();`).
 As the question bank grows, this automatically starts drawing from a
 bigger pool — you don't need to change the randomization logic.
+
+### Category badge & progress bar
+
+Each question screen shows a header row (`.kps-quiz-meta`) with two
+elements kept **deliberately separate**, side by side, instead of one
+long combined sentence:
+
+- **`#quiz-category-badge`** — a colored pill showing the category's mascot
+  icon (falling back to its emoji if there's no icon, e.g. `blessing`) plus
+  its label, e.g. "🙏 Blessing Scam". It's colored per-category using two
+  CSS custom properties set from JS on each question:
+
+  ```javascript
+  categoryBadgeEl.style.setProperty('--badge-bg', cat.color);       // pastel background
+  categoryBadgeEl.style.setProperty('--badge-ink', cat.colorDark);  // matching text color
+  ```
+
+  `color` / `colorDark` live on each entry in `CATEGORIES` (`questions.js`).
+  Add a new category with those two fields and its badge is themed
+  automatically — no CSS changes needed.
+
+- **`#quiz-counter`** — just "Question X of Y", plain text, no icon.
+
+Below that, `.kps-progress-track` / `#quiz-progress-fill` is a simple
+filled bar showing how far through the quiz the player is (`(current + 1)
+/ total`), with `aria-valuenow` / `aria-valuemin` / `aria-valuemax` kept in
+sync on the track element for screen readers.
+
+**Why they're split apart:** an earlier version crammed the icon, emoji,
+category name, a dash, and the question count into a single string. It
+worked, but read as cluttered — especially once question counts grew
+past single digits. Keeping the category badge and the counter as two
+independent elements (and never showing both the icon *and* the emoji at
+once) keeps the header scannable at a glance.
 
 ### Analytics
 
@@ -372,6 +422,150 @@ The fix is one rule near the top of `css/styles.css`:
 hidden/shown via the `hidden` attribute and it doesn't seem to work,
 check whether some other class on it also sets `display` — that's almost
 certainly why, and this rule is what's supposed to prevent it.
+
+---
+
+## Design system
+
+`css/styles.css` is organised as a small design system rather than a pile of
+one-off rules. Read this before adding UI — using the existing tokens is what
+keeps new work looking like it belongs.
+
+### Brand identity (don't dilute this)
+
+The KPS look is **bold rounded type, thick black outlines, and offset "sticker"
+shadows on a purple field**. That is deliberately distinctive and should be
+preserved. The refinements below systematise it; they don't replace it.
+
+### Nunito must be loaded on every page
+
+`body` asks for `'Nunito'`. **The CSS alone doesn't load it.** Every page needs
+this in its `<head>`, above the stylesheet link:
+
+```html
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,600&display=swap" rel="stylesheet" />
+```
+
+This was missing for a long time, and the app silently fell back to Segoe UI on
+Windows — which is most of why it used to look generic. If you add a new page,
+copy this block. To check it's working, run this in the browser console; it
+should say `true`:
+
+```javascript
+document.fonts.check('700 1rem Nunito')
+```
+
+### Tokens
+
+Everything is defined in `:root` at the top of `css/styles.css`. Use the token,
+not a raw value — a hard-coded `0.85rem` or `#555` is how a design system rots.
+
+| Group | Tokens | Notes |
+|---|---|---|
+| Brand | `--kps-purple`, `--kps-purple-dark`, `--kps-bg`, `--kps-ink`, `--kps-muted` | The original palette, unchanged |
+| Derived tints | `--kps-purple-50/100/200/700` | All sampled from the purple ramp — no new hues were introduced |
+| Semantic | `--kps-success`, `--kps-danger` + their `-bg` tints | Dark enough to pass AA on their own tint |
+| Type | `--fs-xs` … `--fs-2xl` | `--fs-base` is **17px**, deliberately larger than typical |
+| Spacing | `--sp-1` … `--sp-10` | 4px grid |
+| Geometry | `--kps-border`, `--kps-radius*` | |
+| Elevation | `--kps-shadow-sm/‑/‑lg`, `--kps-shadow-pressed` | Two layers — see below |
+| Motion | `--dur-fast`, `--dur`, `--ease` | |
+| Targets | `--tap` (48px) | Minimum comfortable hit area |
+
+### Elevation is two layers, always
+
+The flat offset block is the brand mark. The soft ambient shadow underneath is
+what makes it read as crafted rather than flat. Both are baked into each
+elevation token, so just use the token:
+
+```css
+box-shadow: var(--kps-shadow);
+/* = 5px 5px 0 0 black, 0 10px 24px -14px rgba(40, 8, 60, 0.5) */
+```
+
+Interactive elements lift on hover (`translate(-1px, -1px)`, larger shadow) and
+press down on click (`translate(2px, 2px)`, `--kps-shadow-pressed`). That
+physical metaphor is already implied by the offset shadow — the motion just
+makes it responsive.
+
+### Accessibility rules that are not optional
+
+This quiz is built for seniors. These decisions look unusual next to a typical
+SaaS design system and are intentional — **please don't "modernise" them away**:
+
+- **17px base type, 700-weight body copy.** Small, light, low-contrast text is
+  a current design trend and is wrong for this audience.
+- **48px minimum touch targets** (`--tap`) on every button, pill, scale option,
+  and input.
+- **Never signal state with colour alone.** Answer options carry an A/B/C/D key
+  that becomes ✓ or ✗ when answered, *and* change border colour, *and* get an
+  `aria-label`. A colour-blind player gets the same information.
+- **Every text/background pair must hit WCAG AA (4.5:1).** All 17 pairs
+  currently in the palette pass. If you add a category colour, check it — the
+  e-commerce badge originally failed at 4.27:1 and had to be darkened.
+- **`prefers-reduced-motion` is honoured.** The media query at the bottom of the
+  stylesheet strips transforms and transitions. Don't add animation that
+  bypasses it.
+- **One focus treatment**, defined once via `:focus-visible` — a white inner
+  ring plus a purple outer ring, legible on both white cards and purple buttons.
+
+### The logo
+
+`assets/kps/kps_logo.svg` is the logo to use. It was traced from the original
+`kps_logo.png` at 6× resolution, so the gamepad, wordmark, and rounded frame are
+the **same shapes as the original artwork** — just resolution-independent, so it
+stays crisp on retina screens and at any size.
+
+It fills with `currentColor`, which means you can tint it by setting `color` on
+the element:
+
+```css
+.game-header-logo { color: var(--kps-ink); }      /* default black */
+```
+
+The PNG is kept in the repo for anywhere an SVG isn't usable (email, social
+cards). Prefer the SVG on the web.
+
+### Local visual preview
+
+`preview.html` renders the real quiz markup, CSS, and question bank with
+Firebase stubbed out, so you can check design changes without logging in or
+writing test rows to Firestore. With the dev server running:
+
+- `/preview.html` — a question, unanswered
+- `/preview.html?answered=1` — the revealed correct/incorrect state
+- `/preview.html?screen=result` — the results breakdown and full survey
+
+It's excluded from deploys in both `firebase.json` and `.vercelignore`, so it
+never ships. Delete it if you'd rather not keep it.
+
+### The feedback survey
+
+The survey shown after the quiz (the `<template id="survey-template">` block in
+`game/index.html`) has seven questions, aimed at measuring **awareness change**
+rather than just satisfaction:
+
+| Field | Type | Why it's there |
+|---|---|---|
+| `confidenceBefore` | 1–5 | Baseline self-rated confidence |
+| `confidenceAfter` | 1–5 | Paired with the above, gives a measurable delta per player |
+| `feelsMoreAware` | yes / somewhat / no | Direct read on perceived impact |
+| `mostWorryingScam` | category | Which scam type worries them in real life — options are generated from `CATEGORIES`, so this can't drift out of sync with the question bank |
+| `difficulty` | easy / just right / hard | Calibration signal for the question bank |
+| `wouldShare` | yes / maybe / no | Proxy for onward reach beyond the player |
+| `learning` | free text, optional | Qualitative colour for reports |
+
+The `confidenceBefore` / `confidenceAfter` pair is the useful one for impact
+reporting — the difference between them is a per-player awareness delta, which
+is far more defensible to a funder than a satisfaction score.
+
+To add a question: add the markup to the template, and it's picked up
+automatically — `mountSurvey()` submits with
+`Object.fromEntries(new FormData(form))`, so any named field is saved without
+touching the JS. Reuse `.kps-scale` for 1–5 ratings and `.kps-pill-group` for
+short choices.
 
 ---
 
@@ -554,8 +748,11 @@ kps-project-template/
 │           ├── index.js    ← drives admin/index.html
 │           └── dashboard.js ← drives admin/dashboard.html
 ├── assets/kps/             ← logo + favicon
+│   ├── kps_logo.svg        ← vector logo (use this on the web; fills with currentColor)
+│   ├── kps_logo.png        ← original raster logo, kept for non-web use
 │   ├── quiz-bg-tile.png    ← repeating mascot background tile for the game screen
 │   └── categories/         ← full-opacity category mascot art (love, impersonation, investment, ecommerce)
+├── preview.html            ← local-only visual preview, excluded from deploys
 ├── firestore.rules         ← Firestore access rules (read this!)
 ├── firebase.json           ← hosting + Firestore config (used at deploy)
 └── .firebaserc             ← Firebase project ID

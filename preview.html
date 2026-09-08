@@ -1,16 +1,22 @@
 <!doctype html>
+<!--
+  LOCAL VISUAL PREVIEW — not part of the deployed app.
+
+  Renders the real quiz markup, CSS, and question data with Firebase stubbed
+  out, so you can check design changes without logging in or writing to
+  Firestore. Open /preview.html with the dev server running.
+
+  Add ?screen=result to jump straight to the results + survey view.
+  Delete this file before deploying if you'd rather not ship it.
+-->
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>KPS Game</title>
-		<link rel="icon" type="image/png" href="/assets/kps/favicon.png" />
+		<title>KPS — Visual Preview</title>
 		<meta name="theme-color" content="#e6c9ff" />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<!-- Nunito is the brand typeface named in css/styles.css. Without this
-		     link the CSS silently falls back to Segoe UI / system sans, which is
-		     why the app previously looked generic. Keep it on every page. -->
 		<link
 			href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,600&display=swap"
 			rel="stylesheet"
@@ -24,11 +30,6 @@
 				<button type="button" id="game-signout" class="kps-link">Sign out</button>
 			</header>
 			<main class="game-area">
-				<!-- ════════════════════════════════════════════════════════
-				     DEVELOPER: quiz UI. Question content lives in
-				     js/pages/game/questions.js — add more scenarios there,
-				     nothing here needs to change.
-				     ════════════════════════════════════════════════════════ -->
 				<div id="quiz-screen" class="kps-card kps-quiz-card">
 					<div class="kps-quiz-meta">
 						<span id="quiz-category-badge" class="kps-category-badge"></span>
@@ -49,19 +50,13 @@
 						<span id="quiz-score-value" class="kps-score-value"></span>
 						<span id="quiz-score-label" class="kps-score-label"></span>
 					</div>
-					<!-- Per-category results are rendered here by game/index.js so
-					     players see which scam types they should brush up on. -->
 					<div id="quiz-breakdown" class="kps-breakdown"></div>
 					<p id="game-status" class="kps-info" hidden></p>
 					<div id="survey-mount"></div>
 				</div>
-				<!-- ════════════════════════════════════════════════════════
-				     End of developer area
-				     ════════════════════════════════════════════════════════ -->
 			</main>
 		</section>
 
-		<!-- Survey form template (cloned into #survey-mount when the player completes) -->
 		<template id="survey-template">
 			<form class="kps-form kps-survey" data-survey-form>
 				<h2 class="kps-card-subtitle">Quick survey</h2>
@@ -135,6 +130,130 @@
 			</form>
 		</template>
 
-		<script type="module" src="/js/pages/game/index.js"></script>
+		<script type="module">
+			// Uses the REAL question bank and category definitions.
+			import { CATEGORIES, getRandomQuiz } from '/js/pages/game/questions.js';
+
+			const OPTION_KEYS = ['A', 'B', 'C', 'D', 'E', 'F'];
+			const questions = getRandomQuiz();
+			const q = questions[0];
+			const cat = CATEGORIES[q.category];
+
+			// ── Question view ──
+			const badge = document.getElementById('quiz-category-badge');
+			badge.style.setProperty('--badge-bg', cat.color);
+			badge.style.setProperty('--badge-ink', cat.colorDark);
+			if (cat.icon) {
+				const img = document.createElement('img');
+				img.src = cat.icon;
+				img.alt = '';
+				img.className = 'kps-category-icon';
+				badge.appendChild(img);
+			} else {
+				badge.appendChild(document.createTextNode(cat.emoji));
+			}
+			badge.appendChild(document.createTextNode(cat.label));
+
+			document.getElementById('quiz-counter').textContent = `Question 1 of ${questions.length}`;
+			document.getElementById('quiz-progress-fill').style.width = `${Math.round((1 / questions.length) * 100)}%`;
+			document.getElementById('quiz-scenario').textContent = q.scenario;
+
+			const optionsEl = document.getElementById('quiz-options');
+			q.options.forEach((text, i) => {
+				const btn = document.createElement('button');
+				btn.type = 'button';
+				btn.className = 'kps-quiz-option';
+				const key = document.createElement('span');
+				key.className = 'kps-quiz-option-key';
+				key.textContent = OPTION_KEYS[i];
+				const span = document.createElement('span');
+				span.className = 'kps-quiz-option-text';
+				span.textContent = text;
+				btn.append(key, span);
+				optionsEl.appendChild(btn);
+			});
+
+			// ?answered=1 shows the post-answer revealed state
+			if (new URLSearchParams(location.search).has('answered')) {
+				const wrong = q.correctIndex === 0 ? 1 : 0;
+				[...optionsEl.children].forEach((btn, i) => {
+					btn.disabled = true;
+					const key = btn.querySelector('.kps-quiz-option-key');
+					if (i === q.correctIndex) { btn.classList.add('is-correct'); key.textContent = '✓'; }
+					else if (i === wrong) { btn.classList.add('is-incorrect'); key.textContent = '✗'; }
+				});
+				const fb = document.getElementById('quiz-feedback');
+				const strong = document.createElement('strong');
+				strong.textContent = 'Not quite. ';
+				fb.append(strong, document.createTextNode(q.explanation));
+				fb.classList.add('is-incorrect');
+				fb.hidden = false;
+				const next = document.getElementById('quiz-next');
+				next.textContent = 'Next question';
+				next.hidden = false;
+			}
+
+			// ── Results view ──
+			if (new URLSearchParams(location.search).get('screen') === 'result') {
+				document.getElementById('quiz-screen').hidden = true;
+				const result = document.getElementById('quiz-result');
+				result.hidden = false;
+				document.getElementById('quiz-result-title').textContent = 'Well spotted!';
+				document.getElementById('quiz-score-value').textContent = '8/10';
+				document.getElementById('quiz-score-label').textContent = 'scams correctly identified';
+
+				const stats = {
+					impersonation: { correct: 2, total: 2 },
+					blessing: { correct: 1, total: 2 },
+					love: { correct: 2, total: 2 },
+					investment: { correct: 1, total: 2 },
+					ecommerce: { correct: 2, total: 2 },
+				};
+				const bd = document.getElementById('quiz-breakdown');
+				const h = document.createElement('p');
+				h.className = 'kps-breakdown-title';
+				h.textContent = 'How you did by scam type';
+				bd.appendChild(h);
+				Object.entries(stats).forEach(([k, s]) => {
+					const c = CATEGORIES[k];
+					const row = document.createElement('div');
+					row.className = 'kps-breakdown-row';
+					const name = document.createElement('span');
+					name.className = 'kps-breakdown-name';
+					if (c.icon) {
+						const im = document.createElement('img');
+						im.src = c.icon; im.alt = ''; im.className = 'kps-category-icon';
+						name.appendChild(im);
+					} else name.appendChild(document.createTextNode(c.emoji + ' '));
+					name.appendChild(document.createTextNode(c.label));
+					const sc = document.createElement('span');
+					sc.className = 'kps-breakdown-score';
+					sc.textContent = `${s.correct}/${s.total}`;
+					const bar = document.createElement('div');
+					bar.className = 'kps-breakdown-bar';
+					const fill = document.createElement('div');
+					fill.className = 'kps-breakdown-bar-fill';
+					fill.style.width = `${(s.correct / s.total) * 100}%`;
+					bar.appendChild(fill);
+					row.append(name, sc, bar);
+					bd.appendChild(row);
+				});
+
+				const status = document.getElementById('game-status');
+				status.textContent = 'Completion recorded!';
+				status.hidden = false;
+
+				// Mount the survey exactly as the real page does
+				const mount = document.getElementById('survey-mount');
+				mount.appendChild(document.getElementById('survey-template').content.cloneNode(true));
+				const sel = mount.querySelector('[data-category-select]');
+				Object.entries(CATEGORIES).forEach(([key, c]) => {
+					const o = document.createElement('option');
+					o.value = key;
+					o.textContent = `${c.emoji} ${c.label}`;
+					sel.appendChild(o);
+				});
+			}
+		</script>
 	</body>
 </html>

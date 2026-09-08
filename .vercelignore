@@ -6,6 +6,7 @@ firestore.rules
 
 # Source / demo material, not part of the deployed site
 extracted/
+preview.html
 
 # Misc
 README.md

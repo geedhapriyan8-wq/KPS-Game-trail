@@ -22,11 +22,43 @@
  */
 
 export const CATEGORIES = {
-  impersonation: { label: 'Impersonation', emoji: '🎭', icon: '/assets/kps/categories/impersonation.png' },
-  blessing: { label: 'Blessing Scam', emoji: '🙏', icon: null },
-  love: { label: 'Love Scam', emoji: '💕', icon: '/assets/kps/categories/love.png' },
-  investment: { label: 'Investment Scam', emoji: '📈', icon: '/assets/kps/categories/investment.png' },
-  ecommerce: { label: 'E-commerce Scam', emoji: '🛍️', icon: '/assets/kps/categories/ecommerce.png' },
+  impersonation: {
+    label: 'Impersonation',
+    emoji: '🎭',
+    icon: '/assets/kps/categories/impersonation.png',
+    color: '#dbeafe',
+    colorDark: '#1d4ed8',
+  },
+  blessing: {
+    label: 'Blessing Scam',
+    emoji: '🙏',
+    icon: null,
+    color: '#ede9fe',
+    colorDark: '#6d28d9',
+  },
+  love: {
+    label: 'Love Scam',
+    emoji: '💕',
+    icon: '/assets/kps/categories/love.png',
+    color: '#ffe4ef',
+    colorDark: '#be185d',
+  },
+  investment: {
+    label: 'Investment Scam',
+    emoji: '📈',
+    icon: '/assets/kps/categories/investment.png',
+    color: '#fef3c7',
+    colorDark: '#b45309',
+  },
+  ecommerce: {
+    label: 'E-commerce Scam',
+    emoji: '🛍️',
+    icon: '/assets/kps/categories/ecommerce.png',
+    color: '#ffe4d6',
+    // #c2410c only reached 4.27:1 on this tint — below the WCAG AA 4.5
+    // threshold. Keep new categories' colorDark at 4.5:1 or better.
+    colorDark: '#9a3412',
+  },
 };
 
 export const QUESTIONS = [

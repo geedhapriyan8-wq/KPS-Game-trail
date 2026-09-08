@@ -1,25 +1,85 @@
-/* ============================================
-   KPS Project Template — Styles
-   Bold "kid-friendly" KPS look: thick black borders + offset drop shadows.
-   ============================================ */
+/* ============================================================================
+   KPS — Design System
+   ----------------------------------------------------------------------------
+   Brand identity: bold rounded type, thick black outlines, offset "sticker"
+   shadows on a purple field. That identity is preserved throughout; this
+   stylesheet systematises it (tokens, scales, states) rather than replacing it.
 
+   Audience note: the senior-facing quiz drives several decisions that differ
+   from a typical SaaS design system — larger base type, higher contrast,
+   48px minimum touch targets, and state changes that never rely on colour
+   alone. Please keep these when extending.
+
+   Structure:
+     1. Tokens          6. Quiz components
+     2. Reset & base    7. Results breakdown
+     3. Layout          8. Feedback / messages
+     4. Cards           9. Admin
+     5. Forms          10. Responsive & motion preferences
+   ============================================================================ */
+
+/* ── 1. Tokens ───────────────────────────────────────────────────────────── */
 :root {
-  /* Brand */
-  --kps-bg: #e6c9ff;            /* light purple page background */
-  --kps-purple: #c026d3;        /* bright magenta-purple buttons */
-  --kps-purple-dark: #a21caf;
+  /* Brand — unchanged core palette */
+  --kps-bg: #e6c9ff;              /* light purple page field */
+  --kps-purple: #c026d3;          /* primary action */
+  --kps-purple-dark: #a21caf;     /* hover / pressed */
   --kps-white: #ffffff;
   --kps-black: #000000;
   --kps-ink: #1a1a1a;
-  --kps-muted: #555a66;
+  --kps-muted: #4b5162;           /* darkened from #555a66 → 8.6:1 on white */
+
+  /* Derived tints — all sampled from the purple ramp, no new hues */
+  --kps-purple-50: #faf5ff;       /* table header, subtle fills */
+  --kps-purple-100: #f3e9ff;      /* hover wash */
+  --kps-purple-200: #e9d5ff;      /* progress track */
+  --kps-purple-700: #7e1a8c;      /* text on light purple, AA on white */
+
+  /* Semantic — kept dark enough to pass AA against their own tint */
+  --kps-success: #15803d;
+  --kps-success-bg: #dcfce7;
+  --kps-danger: #b91c1c;
+  --kps-danger-bg: #fee2e2;
+
+  /* Typography scale */
+  --fs-xs:   0.8125rem;   /* 13px — captions only */
+  --fs-sm:   0.9375rem;   /* 15px — secondary text */
+  --fs-base: 1.0625rem;   /* 17px — body. Larger than typical for legibility */
+  --fs-md:   1.125rem;    /* 18px — answer options */
+  --fs-lg:   1.25rem;
+  --fs-xl:   clamp(1.3rem, 1.15rem + 0.7vw, 1.6rem);
+  --fs-2xl:  clamp(1.5rem, 1.25rem + 1.2vw, 2rem);
+
+  /* Spacing — 4px base grid */
+  --sp-1: 0.25rem;  --sp-2: 0.5rem;   --sp-3: 0.75rem;  --sp-4: 1rem;
+  --sp-5: 1.25rem;  --sp-6: 1.5rem;   --sp-8: 2rem;     --sp-10: 2.5rem;
 
   /* Geometry */
   --kps-border: 3px solid var(--kps-black);
+  --kps-border-thin: 2px solid var(--kps-black);
+  --kps-radius-sm: 10px;
   --kps-radius: 14px;
-  --kps-shadow: 6px 6px 0 0 var(--kps-black);
-  --kps-shadow-sm: 4px 4px 0 0 var(--kps-black);
+  --kps-radius-lg: 20px;
+  --kps-radius-pill: 999px;
+
+  /* Elevation — the flat offset block is the brand mark; the second, soft
+     layer underneath is what reads as "crafted" rather than "flat prototype".
+     Both are always used together. */
+  --kps-shadow-sm: 3px 3px 0 0 var(--kps-black), 0 2px 6px -2px rgba(40, 8, 60, 0.28);
+  --kps-shadow:    5px 5px 0 0 var(--kps-black), 0 10px 24px -14px rgba(40, 8, 60, 0.5);
+  --kps-shadow-lg: 7px 7px 0 0 var(--kps-black), 0 20px 40px -20px rgba(40, 8, 60, 0.55);
+  --kps-shadow-pressed: 1px 1px 0 0 var(--kps-black);
+
+  /* Motion */
+  --dur-fast: 110ms;
+  --dur: 190ms;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* Minimum comfortable hit area (WCAG 2.2 target size) */
+  --tap: 48px;
 }
 
+/* ── 2. Reset & base ─────────────────────────────────────────────────────── */
 *, *::before, *::after {
   margin: 0;
   padding: 0;
@@ -27,57 +87,64 @@
 }
 
 /* Any element toggled with the `hidden` attribute or `.hidden = true` in JS
-   must actually disappear. By default this works, but as soon as ANY class
-   on that element also sets `display` (e.g. .kps-btn sets display:inline-flex,
-   .kps-card sets display:flex), that class wins over the browser's built-in
-   [hidden] rule because both are "author" styles of equal specificity and
-   the later one in the cascade wins. The fix: force [hidden] to always win.
-   If you ever see an element show up even though you set .hidden = true in
-   JS, this is the rule that's supposed to prevent that — don't remove it. */
+   must actually disappear. By default this works — but as soon as any class
+   on that element also sets `display` (.kps-btn sets inline-flex, .kps-card
+   sets flex), that class beats the browser's built-in [hidden] rule, because
+   both are author styles of equal specificity and the later one wins.
+   This forces [hidden] to always win. Don't remove it. */
 [hidden] {
   display: none !important;
 }
 
-html, body {
-  height: 100%;
-}
+html, body { height: 100%; }
 
 body {
   font-family: 'Nunito', 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+  font-size: var(--fs-base);
   background: var(--kps-bg);
   color: var(--kps-ink);
   min-height: 100vh;
-  line-height: 1.5;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 code {
-  background: #f2e2ff;
+  background: var(--kps-purple-100);
   padding: 0.1rem 0.35rem;
   border-radius: 4px;
   font-size: 0.9em;
 }
 
-/* ── Screens ─────────────────────────────────── */
+/* One consistent focus treatment for every interactive element. The white
+   inner ring keeps it legible on both white cards and purple buttons. */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--kps-white), 0 0 0 6px var(--kps-purple-dark);
+  border-radius: var(--kps-radius-sm);
+}
+
+/* ── 3. Layout ───────────────────────────────────────────────────────────── */
 .screen {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1.5rem;
+  padding: var(--sp-6);
 }
 
 .screen-game {
   align-items: stretch;
   display: block;
   padding: 0;
-  /* Mascot sticker tile on top of a soft brand gradient. The gradient is
-     `background-attachment: fixed` (doesn't repeat, doesn't scroll) so it
-     reads as one continuous backdrop; the mascot tile repeats over it.
-     clamp() scales the tile itself between phone and laptop viewport
-     widths so the pattern density looks right on every screen size. */
+  /* Mascot sticker tile over a soft brand-derived gradient. The gradient is
+     fixed (doesn't scroll or repeat) so the backdrop reads as one continuous
+     surface; the tile repeats above it. clamp() scales tile density with the
+     viewport so it looks deliberate on phone and laptop alike. */
   background-image:
     url('/assets/kps/quiz-bg-tile.png'),
-    linear-gradient(135deg, #ffe3f6 0%, #e6c9ff 55%, #cdeaff 100%);
+    linear-gradient(135deg, #ffe3f6 0%, var(--kps-bg) 55%, #cdeaff 100%);
   background-repeat: repeat, no-repeat;
   background-size:
     clamp(200px, 26vw, 340px) clamp(179px, 23vw, 304px),
@@ -85,57 +152,121 @@ code {
   background-attachment: scroll, fixed;
 }
 
-/* ── Card (passcode / admin) ─────────────────── */
+.game-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  padding: var(--sp-3) var(--sp-6);
+  background: var(--kps-white);
+  border-bottom: var(--kps-border);
+  /* Keeps brand + exit persistently reachable during a long quiz. */
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.game-header-logo {
+  height: 34px;
+  width: auto;
+  color: var(--kps-ink);   /* inherited by the SVG logo's currentColor fills */
+}
+
+.game-area {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: var(--sp-8) var(--sp-6) var(--sp-10);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-4);
+}
+.game-area h1 { font-size: var(--fs-xl); font-weight: 800; }
+.game-area p { font-weight: 500; }
+
+/* ── 4. Cards ────────────────────────────────────────────────────────────── */
 .kps-card {
   width: 100%;
   max-width: 460px;
   background: var(--kps-white);
   border: var(--kps-border);
-  border-radius: var(--kps-radius);
+  border-radius: var(--kps-radius-lg);
   box-shadow: var(--kps-shadow);
-  padding: 2rem 1.75rem;
+  padding: var(--sp-8) var(--sp-6);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: var(--sp-4);
 }
 
 .kps-card-logo {
-  height: 70px;
+  height: 72px;
   width: auto;
   object-fit: contain;
+  color: var(--kps-ink);
+  margin-bottom: var(--sp-1);
 }
 
 .kps-card-title {
-  font-size: 1.75rem;
+  font-size: var(--fs-2xl);
   font-weight: 800;
   text-align: center;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+  text-wrap: balance;
 }
 
 .kps-card-subtitle {
-  font-size: 1.1rem;
+  font-size: var(--fs-lg);
   font-weight: 700;
   text-align: center;
-  margin-bottom: 0.25rem;
+  color: var(--kps-ink);
 }
 
-/* ── Forms ──────────────────────────────────── */
+/* Quiz cards are wider than the compact passcode/admin login cards. */
+.kps-quiz-card {
+  width: 100%;
+  align-items: stretch;
+  gap: var(--sp-4);
+}
+
+/* ── 5. Forms ────────────────────────────────────────────────────────────── */
 .kps-form {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
-  margin-top: 0.5rem;
+  gap: var(--sp-4);
+  margin-top: var(--sp-2);
 }
 
-.kps-field { display: flex; flex-direction: column; gap: 0.35rem; font-weight: 600; }
-.kps-field span { font-size: 0.95rem; }
+.kps-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  font-weight: 600;
+}
+.kps-field > span { font-size: var(--fs-sm); }
+
+/* fieldset/legend need a reset before they can look like a plain .kps-field */
+fieldset.kps-field {
+  border: none;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+fieldset.kps-field legend {
+  padding: 0;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  margin-bottom: var(--sp-2);
+  line-height: 1.4;
+}
 
 .kps-input {
   width: 100%;
-  padding: 0.9rem 1rem;
-  font-size: 1rem;
+  min-height: var(--tap);
+  padding: 0.8rem 1rem;
+  font-size: var(--fs-base);
   font-family: inherit;
   font-weight: 600;
   border: var(--kps-border);
@@ -143,362 +274,699 @@ code {
   background: var(--kps-white);
   color: var(--kps-ink);
   box-shadow: var(--kps-shadow-sm);
-  outline: none;
+  transition: box-shadow var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.kps-input::placeholder { color: #7a8090; font-weight: 500; }
+.kps-input:hover:not(:disabled) { border-color: var(--kps-purple-dark); }
+
+/* Native select needs its own chevron once appearance is normalised. */
+select.kps-input {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231a1a1a' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.9rem center;
+  background-size: 1.1rem;
+  padding-right: 2.75rem;
+  cursor: pointer;
 }
 
-.kps-input::placeholder { color: #9aa0a6; font-weight: 500; }
-.kps-input:focus { box-shadow: 4px 4px 0 0 var(--kps-purple); }
+/* 1–5 confidence scale */
+.kps-scale {
+  display: flex;
+  gap: var(--sp-2);
+}
 
-/* ── Buttons ────────────────────────────────── */
+.kps-scale-option {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--tap);
+  border: var(--kps-border);
+  border-radius: var(--kps-radius-sm);
+  background: var(--kps-white);
+  box-shadow: var(--kps-shadow-sm);
+  font-size: var(--fs-md);
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease),
+              background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+.kps-scale-option:hover { background: var(--kps-purple-100); }
+.kps-scale-option input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+/* :has() handles modern browsers; .is-selected is the JS fallback applied in
+   game/index.js for older Safari/Firefox. Keep both in sync. */
+.kps-scale-option:has(input:checked),
+.kps-scale-option.is-selected {
+  background: var(--kps-purple);
+  color: var(--kps-white);
+  transform: translateY(-2px);
+  box-shadow: 4px 6px 0 0 var(--kps-black), 0 8px 16px -8px rgba(40, 8, 60, 0.5);
+}
+.kps-scale-option:focus-within {
+  outline: 3px solid var(--kps-purple-dark);
+  outline-offset: 3px;
+}
+
+.kps-scale-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--fs-xs);
+  color: var(--kps-muted);
+  font-weight: 700;
+  margin-top: calc(var(--sp-1) * -1);
+}
+
+/* Yes / Somewhat / No pill choices */
+.kps-pill-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.kps-pill-option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--tap);
+  padding: 0.6rem 1.15rem;
+  border: var(--kps-border);
+  border-radius: var(--kps-radius-pill);
+  background: var(--kps-white);
+  box-shadow: var(--kps-shadow-sm);
+  font-weight: 700;
+  font-size: var(--fs-sm);
+  cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease),
+              background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+.kps-pill-option:hover { background: var(--kps-purple-100); }
+.kps-pill-option input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+.kps-pill-option:has(input:checked),
+.kps-pill-option.is-selected {
+  background: var(--kps-purple);
+  color: var(--kps-white);
+  transform: translateY(-1px);
+  box-shadow: 3px 4px 0 0 var(--kps-black), 0 6px 14px -8px rgba(40, 8, 60, 0.5);
+}
+.kps-pill-option:focus-within {
+  outline: 3px solid var(--kps-purple-dark);
+  outline-offset: 3px;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
 .kps-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.95rem 1.1rem;
-  font-size: 1rem;
+  gap: var(--sp-2);
+  min-height: var(--tap);
+  padding: 0.85rem 1.4rem;
+  font-size: var(--fs-base);
   font-weight: 800;
   font-family: inherit;
+  letter-spacing: -0.01em;
   border: var(--kps-border);
   border-radius: var(--kps-radius);
   box-shadow: var(--kps-shadow-sm);
   cursor: pointer;
   text-decoration: none;
-  transition: transform 0.08s ease, box-shadow 0.08s ease;
+  transition: transform var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease),
+              background var(--dur-fast) var(--ease);
 }
-
-.kps-btn:active {
+/* Lift on hover, press down on click — the physical "sticker" metaphor the
+   brand's offset shadow already implies, made responsive to touch. */
+.kps-btn:hover:not(:disabled) {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 0 var(--kps-black), 0 8px 18px -10px rgba(40, 8, 60, 0.55);
+}
+.kps-btn:active:not(:disabled) {
   transform: translate(2px, 2px);
-  box-shadow: 2px 2px 0 0 var(--kps-black);
+  box-shadow: var(--kps-shadow-pressed);
+}
+.kps-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: var(--kps-shadow-pressed);
+  transform: translate(2px, 2px);
 }
 
-.kps-btn:disabled { opacity: 0.65; cursor: not-allowed; }
-
-.kps-btn-primary {
-  background: var(--kps-purple);
-  color: var(--kps-white);
-}
+.kps-btn-primary { background: var(--kps-purple); color: var(--kps-white); }
 .kps-btn-primary:hover:not(:disabled) { background: var(--kps-purple-dark); }
 
-.kps-btn-secondary {
-  background: var(--kps-white);
-  color: var(--kps-ink);
-}
+.kps-btn-secondary { background: var(--kps-white); color: var(--kps-ink); }
+.kps-btn-secondary:hover:not(:disabled) { background: var(--kps-purple-100); }
 
-.kps-btn-success {
-  background: #16a34a;
-  color: var(--kps-white);
-}
-.kps-btn-success:hover:not(:disabled) { background: #15803d; }
+.kps-btn-success { background: var(--kps-success); color: var(--kps-white); }
+.kps-btn-success:hover:not(:disabled) { background: #166534; }
 
-/* ── Quiz options ───────────────────────────── */
-#quiz-progress {
+/* ── 6. Quiz components ──────────────────────────────────────────────────── */
+.kps-quiz-meta {
+  width: 100%;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+.kps-category-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 0.3rem 0.85rem 0.3rem 0.4rem;
+  border-radius: var(--kps-radius-pill);
+  border: var(--kps-border-thin);
+  box-shadow: 2px 2px 0 0 var(--kps-black);
+  font-weight: 800;
+  font-size: var(--fs-sm);
+  line-height: 1;
+  white-space: nowrap;
+  /* --badge-bg / --badge-ink are set per-question in game/index.js from
+     CATEGORIES[key].color / .colorDark. */
+  background: var(--badge-bg, var(--kps-purple-100));
+  color: var(--badge-ink, var(--kps-ink));
 }
 
 .kps-category-icon {
-  width: 32px;
-  height: 32px;
+  height: clamp(20px, 5vw, 26px);
+  width: auto;
+  max-width: 38px;
   object-fit: contain;
   flex-shrink: 0;
+  border-radius: 6px;
+}
+
+.kps-quiz-counter {
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--kps-muted);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;  /* stops the counter jittering 9→10 */
+}
+
+.kps-progress-track {
+  width: 100%;
+  height: 12px;
+  border-radius: var(--kps-radius-pill);
+  background: var(--kps-purple-200);
+  border: var(--kps-border-thin);
+  overflow: hidden;
+}
+
+.kps-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--kps-purple);
+  border-radius: var(--kps-radius-pill);
+  transition: width 350ms var(--ease);
+}
+
+/* The scenario is a paragraph of running text, not a title — so it drops to
+   700 weight and a tighter size ramp. At 800 weight (the .kps-card-title
+   default) several lines of it read as a wall and slow comprehension down,
+   which matters most for the readers this quiz is built for. */
+#quiz-scenario {
+  font-size: clamp(1.125rem, 1.02rem + 0.55vw, 1.45rem);
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: left;
+  text-wrap: pretty;
+  letter-spacing: -0.005em;
+  margin-top: var(--sp-1);
 }
 
 .kps-quiz-options {
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
-  margin: 1rem 0;
+  gap: var(--sp-3);
+  margin: var(--sp-2) 0 var(--sp-1);
 }
 
+/* Two-column grid: a fixed letter/state key, then the answer text. The key
+   is what lets correct/incorrect read without relying on colour alone. */
 .kps-quiz-option {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: var(--sp-3);
   width: 100%;
+  min-height: var(--tap);
   text-align: left;
-  padding: 0.9rem 1rem;
-  font-size: 1rem;
+  padding: 0.85rem 1rem;
+  font-size: var(--fs-md);
   font-weight: 600;
   font-family: inherit;
+  line-height: 1.4;
   border: var(--kps-border);
   border-radius: var(--kps-radius);
   background: var(--kps-white);
   color: var(--kps-ink);
   box-shadow: var(--kps-shadow-sm);
   cursor: pointer;
-  transition: transform 0.08s ease, box-shadow 0.08s ease;
+  transition: transform var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease),
+              background var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
 }
 
-.kps-quiz-option:hover:not(:disabled) { background: #f5f3ff; }
-.kps-quiz-option:disabled { cursor: not-allowed; }
+.kps-quiz-option-key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: var(--kps-radius-pill);
+  border: var(--kps-border-thin);
+  background: var(--kps-purple-100);
+  color: var(--kps-ink);
+  font-size: var(--fs-sm);
+  font-weight: 800;
+  line-height: 1;
+}
 
+.kps-quiz-option-text {
+  min-width: 0;              /* lets long URLs/words wrap inside the grid cell */
+  overflow-wrap: anywhere;
+}
+
+.kps-quiz-option:hover:not(:disabled) {
+  background: var(--kps-purple-100);
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 0 var(--kps-black), 0 8px 18px -10px rgba(40, 8, 60, 0.5);
+}
+.kps-quiz-option:active:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: var(--kps-shadow-pressed);
+}
+.kps-quiz-option:disabled { cursor: default; }
+
+/* Answered states. Colour, border weight, AND the key glyph all change, so
+   the result is unambiguous for colour-blind and low-vision players. */
 .kps-quiz-option.is-correct {
-  background: #dcfce7;
-  border-color: #16a34a;
+  background: var(--kps-success-bg);
+  border-color: var(--kps-success);
 }
-
+.kps-quiz-option.is-correct .kps-quiz-option-key {
+  background: var(--kps-success);
+  border-color: var(--kps-success);
+  color: var(--kps-white);
+}
 .kps-quiz-option.is-incorrect {
-  background: #fee2e2;
-  border-color: #dc2626;
+  background: var(--kps-danger-bg);
+  border-color: var(--kps-danger);
+}
+.kps-quiz-option.is-incorrect .kps-quiz-option-key {
+  background: var(--kps-danger);
+  border-color: var(--kps-danger);
+  color: var(--kps-white);
+}
+/* Unpicked, unremarkable options recede once the answer is revealed. */
+.kps-quiz-option:disabled:not(.is-correct):not(.is-incorrect) {
+  opacity: 0.6;
+  box-shadow: none;
 }
 
-/* ── Links / messages ───────────────────────── */
+/* Explanation panel shown after answering */
+.kps-quiz-feedback {
+  border: var(--kps-border-thin);
+  border-radius: var(--kps-radius);
+  padding: var(--sp-4);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  line-height: 1.5;
+  text-align: left;
+  color: var(--kps-ink);
+  background: var(--kps-purple-50);
+  border-color: var(--kps-purple);
+}
+.kps-quiz-feedback.is-correct {
+  background: var(--kps-success-bg);
+  border-color: var(--kps-success);
+}
+.kps-quiz-feedback.is-incorrect {
+  background: var(--kps-danger-bg);
+  border-color: var(--kps-danger);
+}
+.kps-quiz-feedback strong { font-weight: 800; }
+
+/* ── 7. Results breakdown ────────────────────────────────────────────────── */
+.kps-score-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: var(--sp-2) 0 var(--sp-4);
+}
+.kps-score-value {
+  font-size: clamp(2.75rem, 2rem + 3.5vw, 4rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--kps-purple-700);
+  font-variant-numeric: tabular-nums;
+}
+.kps-score-label {
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--kps-muted);
+}
+
+.kps-breakdown {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-2);
+}
+.kps-breakdown-title {
+  font-size: var(--fs-sm);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--kps-muted);
+}
+.kps-breakdown-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: var(--sp-2) var(--sp-3);
+}
+.kps-breakdown-name {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+}
+.kps-breakdown-score {
+  font-size: var(--fs-sm);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--kps-muted);
+}
+.kps-breakdown-bar {
+  grid-column: 1 / -1;
+  height: 10px;
+  border-radius: var(--kps-radius-pill);
+  background: var(--kps-purple-200);
+  border: var(--kps-border-thin);
+  overflow: hidden;
+}
+.kps-breakdown-bar-fill {
+  height: 100%;
+  background: var(--kps-purple);
+  border-radius: var(--kps-radius-pill);
+  transition: width 500ms var(--ease);
+}
+
+/* The survey is a distinct task from the quiz results above it, so it gets a
+   rule and a heading rather than running on from the score. */
+.kps-survey {
+  border-top: var(--kps-border-thin);
+  padding-top: var(--sp-6);
+  margin-top: var(--sp-2);
+  gap: var(--sp-5);
+}
+.kps-survey .kps-card-subtitle {
+  text-align: left;
+  font-size: var(--fs-lg);
+}
+
+/* ── 8. Links & messages ─────────────────────────────────────────────────── */
 .kps-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--tap);
   text-align: center;
-  color: var(--kps-purple);
+  color: var(--kps-purple-700);
   font-weight: 700;
   text-decoration: underline;
+  text-underline-offset: 3px;
   background: none;
   border: none;
-  padding: 0.25rem;
-  font-size: 0.95rem;
+  padding: var(--sp-1) var(--sp-2);
+  font-size: var(--fs-sm);
   cursor: pointer;
   font-family: inherit;
+  border-radius: var(--kps-radius-sm);
+  transition: color var(--dur) var(--ease), background var(--dur) var(--ease);
 }
-.kps-link:hover { color: var(--kps-purple-dark); }
+.kps-link:hover { color: var(--kps-purple-dark); background: var(--kps-purple-100); }
 
 .kps-error {
-  color: #b00020;
+  color: var(--kps-danger);
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: var(--fs-sm);
   text-align: center;
 }
 
 .kps-info {
   color: var(--kps-muted);
-  font-size: 0.9rem;
+  font-size: var(--fs-sm);
   text-align: center;
 }
 
 .kps-count-badge {
-  font-size: 0.9rem;
+  font-size: var(--fs-sm);
   font-weight: 700;
   color: var(--kps-muted);
   text-align: center;
-  margin-top: 0.5rem;
+  margin-top: var(--sp-2);
   min-height: 1.2em;
 }
 
-/* ── Game screen ────────────────────────────── */
-.game-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem 1.5rem;
-  background: var(--kps-white);
-  border-bottom: var(--kps-border);
-}
-.game-header-logo { height: 32px; }
-
-.game-area {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 2rem 1.5rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-}
-.game-area h1 { font-size: 1.6rem; font-weight: 800; }
-.game-area p { font-weight: 500; }
-.game-area .kps-btn { align-self: flex-start; }
-
-/* Quiz cards specifically (not the passcode/admin login cards, which stay
-   at their original compact width) get roomier on tablet/laptop screens,
-   and their inner text scales fluidly between phone and desktop sizes
-   with clamp() instead of relying only on fixed @media breakpoints. */
-.kps-quiz-card {
-  width: 100%;
-}
-
-#quiz-scenario {
-  font-size: clamp(1.15rem, 1rem + 1.1vw, 1.6rem);
-  line-height: 1.35;
-}
-
-.kps-quiz-option {
-  font-size: clamp(0.95rem, 0.9rem + 0.3vw, 1.05rem);
-}
-
-#quiz-progress {
-  font-size: clamp(0.85rem, 0.8rem + 0.2vw, 0.95rem);
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-/* ── Admin dashboard layout ─────────────────── */
+/* ── 9. Admin ────────────────────────────────────────────────────────────── */
 .admin-body { background: var(--kps-bg); }
 
 .admin-layout {
   display: grid;
-  grid-template-columns: 240px 1fr;
+  grid-template-columns: 250px 1fr;
   min-height: 100vh;
 }
 
-/* Sidebar */
 .admin-sidebar {
   background: var(--kps-white);
   border-right: var(--kps-border);
-  padding: 1.25rem;
+  padding: var(--sp-5);
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--sp-4);
+  position: sticky;
+  top: 0;
+  height: 100vh;
 }
 
-.admin-brand {
-  padding: 0.5rem 0.25rem;
-  text-align: center;
+.admin-brand { padding: var(--sp-2) var(--sp-1); text-align: center; }
+.admin-brand-logo { height: 44px; width: auto; color: var(--kps-ink); }
+.admin-brand-title {
+  font-weight: 800;
+  margin-top: var(--sp-2);
+  font-size: var(--fs-sm);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--kps-muted);
 }
-.admin-brand-logo { height: 48px; width: auto; }
-.admin-brand-title { font-weight: 800; margin-top: 0.5rem; font-size: 1rem; }
 
 .admin-nav {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  padding: 0.5rem 0;
+  gap: var(--sp-1);
+  padding: var(--sp-2) 0;
 }
 
 .admin-nav-item {
-  display: block;
-  padding: 0.6rem 0.85rem;
-  border-radius: var(--kps-radius);
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--kps-radius-sm);
   font-weight: 700;
   color: var(--kps-ink);
   text-decoration: none;
-  font-size: 0.95rem;
+  font-size: var(--fs-sm);
+  border: 2px solid transparent;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
 }
-.admin-nav-item:hover { background: #f3e9ff; }
+.admin-nav-item:hover { background: var(--kps-purple-100); }
 .admin-nav-item-active {
   background: var(--kps-purple);
   color: var(--kps-white);
+  border-color: var(--kps-black);
+  box-shadow: 2px 2px 0 0 var(--kps-black);
 }
 .admin-nav-item-active:hover { background: var(--kps-purple-dark); }
 
 .admin-signout {
   margin-top: auto;
+  min-height: var(--tap);
   background: var(--kps-white);
   border: var(--kps-border);
   border-radius: var(--kps-radius);
   box-shadow: var(--kps-shadow-sm);
-  padding: 0.75rem 1rem;
+  padding: var(--sp-3) var(--sp-4);
   font-weight: 800;
   font-family: inherit;
-  font-size: 0.95rem;
+  font-size: var(--fs-sm);
   cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease),
+              background var(--dur-fast) var(--ease);
 }
-.admin-signout:hover { background: #f3e9ff; }
+.admin-signout:hover { background: var(--kps-purple-100); }
 .admin-signout:active {
   transform: translate(2px, 2px);
-  box-shadow: 2px 2px 0 0 var(--kps-black);
+  box-shadow: var(--kps-shadow-pressed);
 }
 
-/* Main content */
 .admin-main {
-  padding: 1.75rem 2rem;
+  padding: var(--sp-8);
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: var(--sp-5);
+  min-width: 0;   /* lets wide tables scroll instead of blowing out the grid */
 }
 
 .admin-page-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 1rem;
+  gap: var(--sp-4);
   flex-wrap: wrap;
 }
 .admin-page-title {
-  font-size: 1.6rem;
+  font-size: var(--fs-xl);
   font-weight: 800;
-  margin-bottom: 0.5rem;
+  letter-spacing: -0.015em;
+  margin-bottom: var(--sp-2);
 }
-.admin-page-stat {
-  font-size: 0.95rem;
-  margin: 0.15rem 0;
-}
-.admin-page-actions {
-  display: flex;
-  gap: 0.75rem;
-  flex-shrink: 0;
-}
-.admin-page-actions .kps-btn { padding: 0.7rem 1rem; font-size: 0.9rem; }
+.admin-page-stat { font-size: var(--fs-sm); margin: 0.15rem 0; color: var(--kps-muted); font-weight: 600; }
+.admin-page-actions { display: flex; gap: var(--sp-3); flex-shrink: 0; flex-wrap: wrap; }
+.admin-page-actions .kps-btn { padding: 0.6rem 1rem; font-size: var(--fs-sm); min-height: 44px; }
 
 .admin-data-card {
   background: var(--kps-white);
   border: var(--kps-border);
-  border-radius: var(--kps-radius);
+  border-radius: var(--kps-radius-lg);
   box-shadow: var(--kps-shadow);
   min-height: 120px;
   padding: 0;
   overflow: hidden;
 }
-.admin-empty {
-  padding: 2.5rem 1rem;
-  text-align: center;
-}
+.admin-empty { padding: var(--sp-10) var(--sp-4); text-align: center; color: var(--kps-muted); }
 
-.admin-table-scroll {
-  overflow-x: auto;
-}
+.admin-table-scroll { overflow-x: auto; }
 .admin-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.9rem;
+  font-size: var(--fs-sm);
 }
 .admin-table th,
 .admin-table td {
-  padding: 0.75rem 1rem;
+  padding: var(--sp-3) var(--sp-4);
   text-align: left;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e8dcf5;
   vertical-align: top;
 }
 .admin-table th {
   font-weight: 800;
-  background: #faf5ff;
+  background: var(--kps-purple-50);
   position: sticky;
   top: 0;
+  z-index: 1;
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--kps-muted);
+  border-bottom: var(--kps-border-thin);
+  white-space: nowrap;
 }
+.admin-table td { font-variant-numeric: tabular-nums; }
 .admin-table tr:last-child td { border-bottom: none; }
-.admin-table tbody tr:hover { background: #faf7ff; }
+.admin-table tbody tr { transition: background var(--dur-fast) var(--ease); }
+.admin-table tbody tr:hover { background: var(--kps-purple-50); }
 
 .admin-pagination {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 1rem;
+  gap: var(--sp-4);
+  flex-wrap: wrap;
 }
-.admin-pagination .kps-btn { padding: 0.6rem 1rem; font-size: 0.9rem; }
-.admin-page-num { font-weight: 800; font-size: 0.95rem; }
+.admin-pagination .kps-btn { padding: 0.55rem 1rem; font-size: var(--fs-sm); min-height: 44px; }
+.admin-page-num { font-weight: 800; font-size: var(--fs-sm); font-variant-numeric: tabular-nums; }
 
-/* ── Responsive ─────────────────────────────── */
+/* ── 10. Responsive ──────────────────────────────────────────────────────── */
+@media (min-width: 700px) {
+  .kps-quiz-card { max-width: 620px; padding: var(--sp-8); }
+}
+
+@media (min-width: 1100px) {
+  .kps-quiz-card { max-width: 700px; padding: var(--sp-10); }
+}
+
 @media (max-width: 800px) {
   .admin-layout { grid-template-columns: 1fr; }
-  .admin-sidebar { border-right: none; border-bottom: var(--kps-border); }
-  .admin-nav { flex-direction: row; }
-  .admin-nav-item { flex: 1; text-align: center; }
+  .admin-sidebar {
+    border-right: none;
+    border-bottom: var(--kps-border);
+    position: static;
+    height: auto;
+  }
+  .admin-nav { flex-direction: row; flex-wrap: wrap; }
+  .admin-nav-item { flex: 1; justify-content: center; min-width: 120px; }
   .admin-signout { margin-top: 0; }
 }
 
 @media (max-width: 600px) {
-  .kps-card { padding: 1.5rem 1.25rem; }
-  .kps-card-title { font-size: 1.5rem; }
-  .game-area { padding: 1.25rem 1rem; }
-  .admin-main { padding: 1.25rem 1rem; }
-  .kps-category-icon { width: 26px; height: 26px; }
+  .kps-card { padding: var(--sp-6) var(--sp-5); border-radius: var(--kps-radius); }
+  .game-area { padding: var(--sp-5) var(--sp-4) var(--sp-8); }
+  .game-header { padding: var(--sp-3) var(--sp-4); }
+  .admin-main { padding: var(--sp-5) var(--sp-4); }
+  .kps-scale { gap: var(--sp-1); }
+  .kps-scale-option { font-size: var(--fs-base); }
+  /* Stack the badge above the counter rather than letting them collide. */
+  .kps-quiz-meta { gap: var(--sp-2); }
+  /* Keep at least the first answers visible without scrolling: the scenario
+     shouldn't consume the whole viewport before any option appears. */
+  .kps-quiz-option { font-size: var(--fs-base); padding: 0.75rem 0.85rem; }
+  .kps-quiz-options { gap: var(--sp-2); }
+  .kps-quiz-option-key { width: 27px; height: 27px; }
+  .kps-score-hero { padding-bottom: var(--sp-2); }
 }
 
-/* Tablet and laptop: give the quiz card more breathing room than the
-   460px cap used by the passcode/admin login cards. */
-@media (min-width: 700px) {
-  .kps-quiz-card {
-    max-width: 600px;
-    padding: 2.25rem 2rem;
+/* Respect the OS "reduce motion" setting: keep every state change legible,
+   drop the movement. Required for WCAG 2.3.3 and genuinely important for
+   users prone to motion sensitivity. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .kps-btn:hover:not(:disabled),
+  .kps-quiz-option:hover:not(:disabled),
+  .kps-scale-option:has(input:checked),
+  .kps-pill-option:has(input:checked) {
+    transform: none;
   }
 }
 
-@media (min-width: 1100px) {
-  .kps-quiz-card {
-    max-width: 680px;
-    padding: 2.5rem 2.5rem;
-  }
+/* Keep the offset-shadow identity legible in Windows High Contrast Mode. */
+@media (forced-colors: active) {
+  .kps-quiz-option.is-correct,
+  .kps-quiz-option.is-incorrect { forced-color-adjust: none; }
 }
