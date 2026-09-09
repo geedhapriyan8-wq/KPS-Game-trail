@@ -13,12 +13,24 @@
  *
  * Shape:
  *   {
- *     category: 'impersonation' | 'blessing' | 'love' | 'investment',
+ *     category: 'impersonation' | 'blessing' | 'love' | 'investment' | 'ecommerce',
+ *     id: 'imp-01',              // stable, unique — see below
  *     scenario: 'The situation described to the player',
  *     options: ['choice A', 'choice B', 'choice C', 'choice D'],
  *     correctIndex: 0,           // index into options[]
  *     explanation: 'Why that answer is right, shown after they answer',
  *   }
+ *
+ * `id` must be unique and must NEVER be reused or reassigned — every answer
+ * saved to Firestore records it, so changing an id silently breaks the link
+ * between stored results and the question they came from. Convention is a
+ * three-letter category prefix plus a number: imp-01, luv-03, ecm-02.
+ *
+ * IMPORTANT — don't give the answer away: the player is never shown which
+ * scam category a question belongs to until after they've answered. Naming
+ * the category up front ("Love Scam") tells them what to look for and makes
+ * the question far easier than the real situation would be. Keep the category
+ * out of the `scenario` text too.
  */
 
 export const CATEGORIES = {
@@ -64,6 +76,7 @@ export const CATEGORIES = {
 export const QUESTIONS = [
   {
     category: 'impersonation',
+    id: 'imp-01',
     scenario:
       'A caller says he is a police officer investigating a case linked to your bank account, which has been used for "money laundering". He tells you to transfer your savings to a "safe account" while investigations continue.',
     options: [
@@ -78,6 +91,7 @@ export const QUESTIONS = [
   },
   {
     category: 'impersonation',
+    id: 'imp-02',
     scenario:
       'Your "grandson" messages you on WhatsApp from a new number saying he lost his phone and urgently needs $2,000 transferred to a friend\u2019s account to pay for something before he can call you back.',
     options: [
@@ -92,6 +106,7 @@ export const QUESTIONS = [
   },
   {
     category: 'blessing',
+    id: 'bls-01',
     scenario:
       'An elderly stranger approaches you and says your family has bad luck because of a curse, and offers to "cleanse" your gold jewellery and cash by praying over them \u2014 but you must hand the items over first.',
     options: [
@@ -106,6 +121,7 @@ export const QUESTIONS = [
   },
   {
     category: 'blessing',
+    id: 'bls-02',
     scenario:
       'A "temple medium" calls and says your health problems are caused by evil spirits. She offers to double your money through a special ritual if you first transfer your savings to her for "blessing".',
     options: [
@@ -120,6 +136,7 @@ export const QUESTIONS = [
   },
   {
     category: 'love',
+    id: 'luv-01',
     scenario:
       'You have been chatting for two months with someone you met online who says he\u2019s an engineer working overseas. He has never video called you, and now says he needs money urgently for a "customs fee" to fly to Singapore to meet you.',
     options: [
@@ -134,6 +151,7 @@ export const QUESTIONS = [
   },
   {
     category: 'love',
+    id: 'luv-02',
     scenario:
       'Your new online partner introduces you to a "friend" who works at an investment company, and suggests you both put money into a trading platform "together" to build your future.',
     options: [
@@ -148,6 +166,7 @@ export const QUESTIONS = [
   },
   {
     category: 'investment',
+    id: 'inv-01',
     scenario:
       'A former schoolmate adds you to a WhatsApp group where members share screenshots of huge profits from a cryptocurrency platform, and encourages everyone to "join early" with a guaranteed 20% monthly return.',
     options: [
@@ -162,6 +181,7 @@ export const QUESTIONS = [
   },
   {
     category: 'investment',
+    id: 'inv-02',
     scenario:
       'You see a Facebook ad featuring a well-known local TV personality "endorsing" an investment app that promises to turn $500 into $5,000 in a month. The app asks you to top up more funds before you can withdraw your "profits".',
     options: [
@@ -176,6 +196,7 @@ export const QUESTIONS = [
   },
   {
     category: 'ecommerce',
+    id: 'ecm-01',
     scenario:
       'You find a brand-new air fryer on Carousell for half the usual price. The seller has no reviews yet and asks you to PayNow the full amount to a personal mobile number before shipping, with no option to pay on delivery.',
     options: [
@@ -190,6 +211,7 @@ export const QUESTIONS = [
   },
   {
     category: 'ecommerce',
+    id: 'ecm-02',
     scenario:
       'A Facebook ad shows a well-known electronics brand having a "warehouse clearance sale" at 80% off, linking to a site that looks slightly different from the brand\u2019s real website and only accepts bank transfer.',
     options: [

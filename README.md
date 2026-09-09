@@ -11,6 +11,8 @@ A starter template for Kids PlaySafer educational web apps and games — powered
 - [Analytics](#analytics)
 - [Building your game](#building-your-game)
 - [The scam quiz game (senior edition)](#the-scam-quiz-game-senior-edition)
+- [What gets stored (data model)](#what-gets-stored-data-model)
+- [Deploying to Firebase](#deploying-to-firebase)
 - [Design system](#design-system)
 - [Common snippets](#common-snippets)
 - [Deploying](#deploying)
@@ -274,39 +276,36 @@ quiz playthrough:
 As the question bank grows, this automatically starts drawing from a
 bigger pool — you don't need to change the randomization logic.
 
-### Category badge & progress bar
+### Question header & progress bar
 
-Each question screen shows a header row (`.kps-quiz-meta`) with two
-elements kept **deliberately separate**, side by side, instead of one
-long combined sentence:
+Each question screen shows a header row (`.kps-quiz-meta`) with two elements:
 
-- **`#quiz-category-badge`** — a colored pill showing the category's mascot
-  icon (falling back to its emoji if there's no icon, e.g. `blessing`) plus
-  its label, e.g. "🙏 Blessing Scam". It's colored per-category using two
-  CSS custom properties set from JS on each question:
+- **A neutral "Spot the scam" label** (`.kps-quiz-prompt`). This is
+  deliberately **not** the scam category. Naming the category up front
+  ("Love Scam") tells the player exactly what to look for and makes the
+  question far easier than the real-life situation would be — it gives the
+  answer away. Don't put the category here, and keep it out of the scenario
+  text too.
+- **`#quiz-counter`** — "Question X of Y", plain text.
 
-  ```javascript
-  categoryBadgeEl.style.setProperty('--badge-bg', cat.color);       // pastel background
-  categoryBadgeEl.style.setProperty('--badge-ink', cat.colorDark);  // matching text color
-  ```
+Below that, `.kps-progress-track` / `#quiz-progress-fill` shows how far through
+the quiz the player is, with `aria-valuenow` kept in sync for screen readers.
 
-  `color` / `colorDark` live on each entry in `CATEGORIES` (`questions.js`).
-  Add a new category with those two fields and its badge is themed
-  automatically — no CSS changes needed.
+**The category is revealed after answering**, as a coloured tag inside the
+feedback panel (`.kps-feedback-category`), and again on the results breakdown.
+That's the right moment for it: naming the pattern once the player has
+committed is what turns a single question into a transferable lesson.
 
-- **`#quiz-counter`** — just "Question X of Y", plain text, no icon.
+The tag is themed per-category from two CSS custom properties set in JS:
 
-Below that, `.kps-progress-track` / `#quiz-progress-fill` is a simple
-filled bar showing how far through the quiz the player is (`(current + 1)
-/ total`), with `aria-valuenow` / `aria-valuemin` / `aria-valuemax` kept in
-sync on the track element for screen readers.
+```javascript
+tag.style.setProperty('--badge-bg', cat.color);       // pastel background
+tag.style.setProperty('--badge-ink', cat.colorDark);  // matching text colour
+```
 
-**Why they're split apart:** an earlier version crammed the icon, emoji,
-category name, a dash, and the question count into a single string. It
-worked, but read as cluttered — especially once question counts grew
-past single digits. Keeping the category badge and the counter as two
-independent elements (and never showing both the icon *and* the emoji at
-once) keeps the header scannable at a glance.
+`color` / `colorDark` live on each entry in `CATEGORIES` (`questions.js`), so a
+new category is themed automatically — just keep `colorDark` at 4.5:1 contrast
+or better against its `color`.
 
 ### Analytics
 
@@ -422,6 +421,137 @@ The fix is one rule near the top of `css/styles.css`:
 hidden/shown via the `hidden` attribute and it doesn't seem to work,
 check whether some other class on it also sets `display` — that's almost
 certainly why, and this rule is what's supposed to prevent it.
+
+---
+
+## What gets stored (data model)
+
+Two collections capture everything the quiz produces. Both are written by
+`js/pages/game/index.js` and validated by `firestore.rules`.
+
+### `completions` — one document per playthrough
+
+```javascript
+{
+  createdAt: <serverTimestamp>,
+  source: 'scam_scenario_quiz',
+  score: 8,
+  total: 10,
+  durationMs: 143201,
+  categoryStats: {
+    impersonation: { correct: 2, total: 2 },
+    blessing:      { correct: 1, total: 2 },
+    // ... one entry per category the player saw
+  },
+  answers: [
+    {
+      questionId: 'blessing-02',  // stable id from questions.js
+      category: 'blessing',
+      position: 1,                // where it fell in this playthrough
+      selectedIndex: 0,           // what they picked
+      correctIndex: 1,            // what was right
+      correct: false,
+      timeMs: 12480,              // time spent on this question
+    },
+    // ... one entry per question
+  ],
+}
+```
+
+`answers` is the important addition: it records **every individual right and
+wrong answer**, not just the total. Because `selectedIndex` is stored, you can
+see *which wrong option* people pick — that tells you whether a distractor is
+genuinely tempting (useful) or just confusing (needs rewriting).
+
+Public read is allowed so the passcode screen can show a live "games played"
+count. Keep this collection anonymous — no names, no personal details.
+
+### `surveys` — one document per feedback response
+
+```javascript
+{
+  createdAt: <serverTimestamp>,
+  source: 'scam_scenario_quiz',
+  completionId: 'AbC123...',      // links to the completion above
+  confidenceBefore: '2',
+  confidenceAfter: '4',
+  feelsMoreAware: 'yes',
+  mostWorryingScam: 'impersonation',
+  difficulty: 'just_right',
+  wouldShare: 'yes',
+  learning: 'Never send money to someone I have not met.',
+}
+```
+
+`completionId` is what makes this genuinely analysable: you can join a person's
+self-reported confidence change to how they *actually* scored. "Players who
+said they felt more aware also improved on impersonation questions" is a much
+stronger claim than either number alone.
+
+Admin-read only, since free text could conceivably identify someone.
+
+### Seeing the data
+
+The admin dashboard (`/admin/dashboard.html`) has three views:
+
+| View | Shows |
+|---|---|
+| **Surveys** | One row per feedback response |
+| **Completions** | One row per playthrough — score, %, time taken, per-category split |
+| **Question accuracy** | Aggregated across all players: how often each question is answered correctly, **worst first** |
+
+"Question accuracy" is the one to check regularly. The questions at the top are
+either genuinely hard (teach them harder) or badly worded (rewrite them) — and
+the accuracy figure tells you which questions are doing real work.
+
+The **Export All (.xlsx)** button exports whichever view is currently open.
+
+---
+
+## Deploying to Firebase
+
+### Before your first deploy
+
+1. **Firebase Console → Authentication → Users.** Create the shared player
+   account (`developer@kidsplaysafer.sg`) with the passcode players will type,
+   and a separate admin account with your own email.
+2. **Firestore → `admins` collection.** Add a document whose **ID is your
+   admin account's Auth UID**, with fields `email` (string) and `role: admin`.
+   Without this you'll be signed straight back out of the dashboard.
+3. **Check `.firebaserc`** points at the right project ID.
+4. **Run the rules tests** (see `tests/rules/`) — the rules reject unexpected
+   fields, so this catches a broken write before your players hit it.
+
+### Deploy
+
+```bash
+npx firebase login          # once
+npx firebase deploy --only firestore:rules,hosting
+```
+
+Deploy the rules **at the same time as** hosting, or before it. The current
+rules validate fields that older rules don't know about — if you deploy the
+site without the rules, every completion write will be rejected and players
+will see "Could not record completion".
+
+### Verify after deploying
+
+Play one full round on the live URL, then check in the Firebase Console that:
+
+- a new `completions` document exists, and its `answers` array has one entry
+  per question;
+- a new `surveys` document exists, and its `completionId` matches that
+  completion's document ID;
+- the dashboard's three views all load.
+
+If a write fails, the browser console shows the rules rejection. The most
+common cause is adding a field in `game/index.js` without adding it to the
+`hasOnly([...])` list in `firestore.rules`.
+
+### `preview.html` is not deployed
+
+It's excluded in both `firebase.json` and `.vercelignore`. Delete it if you'd
+rather it weren't in the repo at all.
 
 ---
 

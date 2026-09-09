@@ -39,7 +39,6 @@ function initGame() {
   });
 
   const quizScreen = document.getElementById('quiz-screen');
-  const categoryBadgeEl = document.getElementById('quiz-category-badge');
   const counterEl = document.getElementById('quiz-counter');
   const progressTrackEl = document.querySelector('.kps-progress-track');
   const progressFillEl = document.getElementById('quiz-progress-fill');
@@ -58,7 +57,11 @@ function initGame() {
 
   let current = 0;
   let score = 0;
+  let questionShownAt = null;
   const startedAt = Date.now();
+
+  // One entry per answered question, saved with the completion document.
+  const answers = [];
 
   // A new random draw from the question bank every time the game loads —
   // covers every category, but the specific questions and their order
@@ -75,28 +78,13 @@ function initGame() {
 
   function renderQuestion() {
     const q = quizQuestions[current];
-    const cat = CATEGORIES[q.category];
     const total = quizQuestions.length;
 
-    // Category badge — shows the mascot icon when we have one, otherwise
-    // falls back to the emoji, so we never show both (that read as
-    // cluttered/redundant next to the question counter).
-    categoryBadgeEl.innerHTML = '';
-    categoryBadgeEl.style.setProperty('--badge-bg', cat?.color || '#ede9fe');
-    categoryBadgeEl.style.setProperty('--badge-ink', cat?.colorDark || '#1a1a1a');
-    if (cat?.icon) {
-      const icon = document.createElement('img');
-      icon.src = cat.icon;
-      icon.alt = '';
-      icon.className = 'kps-category-icon';
-      categoryBadgeEl.appendChild(icon);
-    } else if (cat?.emoji) {
-      categoryBadgeEl.appendChild(document.createTextNode(cat.emoji));
-    }
-    categoryBadgeEl.appendChild(document.createTextNode(cat ? cat.label : 'Scam Quiz'));
+    // NOTE: the scam category is deliberately not shown here — revealing it
+    // would tell the player what to look for. It's shown in the feedback
+    // panel once they've answered, and again on the results breakdown.
 
-    // Question counter — kept as its own element, deliberately separate
-    // from the category badge rather than one long combined string.
+    // Question counter — its own element, separate from anything else.
     counterEl.textContent = `Question ${current + 1} of ${total}`;
 
     // Progress bar reflects how far into the quiz the player is.
@@ -108,7 +96,10 @@ function initGame() {
 
     scenarioEl.textContent = q.scenario;
     feedbackEl.hidden = true;
+    feedbackEl.classList.remove('is-correct', 'is-incorrect');
     nextBtn.hidden = true;
+
+    questionShownAt = Date.now();
 
     optionsEl.innerHTML = '';
     q.options.forEach((optionText, index) => {
@@ -136,6 +127,7 @@ function initGame() {
 
   function selectAnswer(index, btn) {
     const q = quizQuestions[current];
+    const cat = CATEGORIES[q.category];
     const isCorrect = index === q.correctIndex;
     if (isCorrect) score++;
 
@@ -144,9 +136,23 @@ function initGame() {
       if (isCorrect) categoryStats[q.category].correct++;
     }
 
-    // Per-question analytics — lets the admin dashboard see which scam
-    // categories and specific scenarios seniors get wrong most often.
+    // Per-answer record saved to Firestore with the completion. This is what
+    // lets you analyse which specific scenarios and distractors trip people
+    // up, rather than only seeing a final score.
+    answers.push({
+      questionId: q.id,
+      category: q.category,
+      position: current + 1,          // where it fell in this playthrough
+      selectedIndex: index,
+      correctIndex: q.correctIndex,
+      correct: isCorrect,
+      timeMs: questionShownAt ? Date.now() - questionShownAt : null,
+    });
+
+    // Per-question analytics event (Firebase Analytics, separate from the
+    // Firestore record above — useful for funnels rather than reporting).
     logKpsEvent(EVENTS.QUESTION_ANSWERED, {
+      questionId: q.id,
       questionIndex: current,
       category: q.category,
       correct: isCorrect,
@@ -168,11 +174,23 @@ function initGame() {
       }
     });
 
-    // Feedback panel: bold verdict first, then the explanation.
+    // Feedback panel: verdict, then which scam type this was (safe to reveal
+    // now that they've committed to an answer), then the explanation.
     feedbackEl.innerHTML = '';
     const verdict = document.createElement('strong');
     verdict.textContent = isCorrect ? "That's right. " : 'Not quite. ';
-    feedbackEl.append(verdict, document.createTextNode(q.explanation));
+    feedbackEl.appendChild(verdict);
+
+    if (cat) {
+      const tag = document.createElement('span');
+      tag.className = 'kps-feedback-category';
+      tag.style.setProperty('--badge-bg', cat.color);
+      tag.style.setProperty('--badge-ink', cat.colorDark);
+      tag.textContent = `${cat.emoji} ${cat.label}`;
+      feedbackEl.append(tag, document.createTextNode(' '));
+    }
+
+    feedbackEl.appendChild(document.createTextNode(q.explanation));
     feedbackEl.classList.toggle('is-correct', isCorrect);
     feedbackEl.classList.toggle('is-incorrect', !isCorrect);
     feedbackEl.hidden = false;
@@ -209,23 +227,26 @@ function initGame() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     try {
-      await dbHelpers.add(COLLECTIONS.COMPLETIONS, {
+      const completionId = await dbHelpers.add(COLLECTIONS.COMPLETIONS, {
         source: 'scam_scenario_quiz',
         score,
         total: quizQuestions.length,
         durationMs: Date.now() - startedAt,
         categoryStats,
+        answers,
       });
       logKpsEvent(EVENTS.GAME_COMPLETED, { source: 'scam_scenario_quiz', score, total: quizQuestions.length });
       status.textContent = 'Completion recorded!';
       status.hidden = false;
-      mountSurvey(surveyMount);
+      // The survey stores this id so responses can be joined back to the
+      // player's actual answers when you analyse the data.
+      mountSurvey(surveyMount, completionId);
     } catch {
       status.textContent = 'Could not record completion.';
       status.hidden = false;
       // The survey still matters even if the completion write failed, so it is
       // mounted either way rather than being lost to a network error.
-      mountSurvey(surveyMount);
+      mountSurvey(surveyMount, null);
     }
   }
 
@@ -283,7 +304,15 @@ function initGame() {
   }
 }
 
-function mountSurvey(container) {
+/**
+ * Clones the survey template into the results card and wires up submission.
+ *
+ * @param {HTMLElement} container  where to mount
+ * @param {string|null} completionId  id of the completion doc this survey
+ *   belongs to, so responses can be joined to the player's actual answers.
+ *   Null when the completion write failed.
+ */
+function mountSurvey(container, completionId) {
   container.innerHTML = '';
   const template = document.getElementById('survey-template');
   container.appendChild(template.content.cloneNode(true));
@@ -324,6 +353,9 @@ function mountSurvey(container) {
     submitBtn.disabled = true;
     submitBtn.textContent = 'Submitting...';
     const data = Object.fromEntries(new FormData(form).entries());
+    // Link this response to the playthrough it came from.
+    if (completionId) data.completionId = completionId;
+    data.source = 'scam_scenario_quiz';
     try {
       await dbHelpers.add(COLLECTIONS.SURVEYS, data);
       logKpsEvent(EVENTS.SURVEY_COMPLETED);

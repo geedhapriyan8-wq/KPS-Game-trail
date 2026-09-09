@@ -38,7 +38,7 @@
 			<main class="admin-main">
 				<div class="admin-page-header">
 					<div>
-						<h1 class="admin-page-title">Survey Responses</h1>
+						<h1 class="admin-page-title" id="page-title">Survey Responses</h1>
 						<p class="admin-page-stat"><strong>Total Completions:</strong> <span id="total-completions">—</span></p>
 						<p class="admin-page-stat"><strong>Total Surveys:</strong> <span id="total-surveys">—</span></p>
 					</div>
@@ -46,6 +46,13 @@
 						<button type="button" id="export-btn" class="kps-btn kps-btn-success">Export All (.xlsx)</button>
 						<button type="button" id="refresh-btn" class="kps-btn kps-btn-secondary">Refresh</button>
 					</div>
+				</div>
+
+				<!-- Switches the table below between the three views. -->
+				<div class="admin-tabs" role="tablist" aria-label="Data view">
+					<button type="button" class="admin-tab admin-tab-active" role="tab" data-view="surveys" aria-selected="true">Surveys</button>
+					<button type="button" class="admin-tab" role="tab" data-view="completions" aria-selected="false">Completions</button>
+					<button type="button" class="admin-tab" role="tab" data-view="questions" aria-selected="false">Question accuracy</button>
 				</div>
 
 				<div class="admin-data-card" id="survey-container">

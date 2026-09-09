@@ -32,7 +32,7 @@
 			<main class="game-area">
 				<div id="quiz-screen" class="kps-card kps-quiz-card">
 					<div class="kps-quiz-meta">
-						<span id="quiz-category-badge" class="kps-category-badge"></span>
+						<span class="kps-quiz-prompt">Spot the scam</span>
 						<span id="quiz-counter" class="kps-quiz-counter"></span>
 					</div>
 					<div class="kps-progress-track" role="progressbar" aria-label="Quiz progress">
@@ -140,20 +140,6 @@
 			const cat = CATEGORIES[q.category];
 
 			// ── Question view ──
-			const badge = document.getElementById('quiz-category-badge');
-			badge.style.setProperty('--badge-bg', cat.color);
-			badge.style.setProperty('--badge-ink', cat.colorDark);
-			if (cat.icon) {
-				const img = document.createElement('img');
-				img.src = cat.icon;
-				img.alt = '';
-				img.className = 'kps-category-icon';
-				badge.appendChild(img);
-			} else {
-				badge.appendChild(document.createTextNode(cat.emoji));
-			}
-			badge.appendChild(document.createTextNode(cat.label));
-
 			document.getElementById('quiz-counter').textContent = `Question 1 of ${questions.length}`;
 			document.getElementById('quiz-progress-fill').style.width = `${Math.round((1 / questions.length) * 100)}%`;
 			document.getElementById('quiz-scenario').textContent = q.scenario;
@@ -185,7 +171,13 @@
 				const fb = document.getElementById('quiz-feedback');
 				const strong = document.createElement('strong');
 				strong.textContent = 'Not quite. ';
-				fb.append(strong, document.createTextNode(q.explanation));
+				fb.appendChild(strong);
+				const tag = document.createElement('span');
+				tag.className = 'kps-feedback-category';
+				tag.style.setProperty('--badge-bg', cat.color);
+				tag.style.setProperty('--badge-ink', cat.colorDark);
+				tag.textContent = `${cat.emoji} ${cat.label}`;
+				fb.append(tag, document.createTextNode(' '), document.createTextNode(q.explanation));
 				fb.classList.add('is-incorrect');
 				fb.hidden = false;
 				const next = document.getElementById('quiz-next');

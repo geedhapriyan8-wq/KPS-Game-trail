@@ -442,6 +442,27 @@ select.kps-input {
   flex-wrap: wrap;
 }
 
+/* Neutral label on the question screen. This is intentionally NOT the scam
+   category — see the comment in game/index.html. The category badge below is
+   still used, but only after answering and on the results breakdown. */
+.kps-quiz-prompt {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 0.3rem 0.9rem;
+  border-radius: var(--kps-radius-pill);
+  border: var(--kps-border-thin);
+  box-shadow: 2px 2px 0 0 var(--kps-black);
+  background: var(--kps-purple-100);
+  color: var(--kps-purple-700);
+  font-weight: 800;
+  font-size: var(--fs-sm);
+  line-height: 1;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
 .kps-category-badge {
   display: inline-flex;
   align-items: center;
@@ -620,6 +641,20 @@ select.kps-input {
   border-color: var(--kps-danger);
 }
 .kps-quiz-feedback strong { font-weight: 800; }
+
+/* Scam category, revealed inline in the feedback panel after answering. */
+.kps-feedback-category {
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  margin-right: 0.15rem;
+  border-radius: var(--kps-radius-pill);
+  border: 1.5px solid currentColor;
+  background: var(--badge-bg, var(--kps-purple-100));
+  color: var(--badge-ink, var(--kps-ink));
+  font-weight: 800;
+  font-size: 0.9em;
+  white-space: nowrap;
+}
 
 /* ── 7. Results breakdown ────────────────────────────────────────────────── */
 .kps-score-hero {
@@ -855,6 +890,36 @@ select.kps-input {
 .admin-page-stat { font-size: var(--fs-sm); margin: 0.15rem 0; color: var(--kps-muted); font-weight: 600; }
 .admin-page-actions { display: flex; gap: var(--sp-3); flex-shrink: 0; flex-wrap: wrap; }
 .admin-page-actions .kps-btn { padding: 0.6rem 1rem; font-size: var(--fs-sm); min-height: 44px; }
+
+/* View switcher above the data table */
+.admin-tabs {
+  display: flex;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+}
+
+.admin-tab {
+  min-height: 44px;
+  padding: var(--sp-2) var(--sp-4);
+  font-family: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 800;
+  color: var(--kps-ink);
+  background: var(--kps-white);
+  border: var(--kps-border-thin);
+  border-radius: var(--kps-radius-pill);
+  box-shadow: 2px 2px 0 0 var(--kps-black);
+  cursor: pointer;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease),
+              transform var(--dur-fast) var(--ease);
+}
+.admin-tab:hover { background: var(--kps-purple-100); }
+.admin-tab:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 0 var(--kps-black); }
+.admin-tab-active {
+  background: var(--kps-purple);
+  color: var(--kps-white);
+}
+.admin-tab-active:hover { background: var(--kps-purple-dark); }
 
 .admin-data-card {
   background: var(--kps-white);

@@ -1,53 +1,112 @@
 rules_version = '2';
 
 // ════════════════════════════════════════════════════════════════
-// Firestore security rules for the KPS project template.
+// Firestore security rules for the KPS scam-awareness quiz.
 //
 // Quick reference:
 //
 //   completions  — public read, anyone signed in can create
+//                  (score, per-category stats, and per-question answers)
 //   surveys      — admin read only, anyone signed in can create
-//   admins       — owner-only read, no client writes (admin adds via console)
+//   admins       — owner-only read, no client writes (added via console)
 //
-// Deploy with: npx firebase deploy --only hosting,firestore:rules
-// Or just the rules: npx firebase deploy --only firestore:rules
+// Deploy with: npx firebase deploy --only firestore:rules
 // Local dev talks to real Firebase, so the same rules apply in dev and prod.
+//
+// NOTE ON VALIDATION: every player shares one passcode account, so
+// `request.auth != null` does not identify an individual. These rules
+// therefore also bound the SHAPE and SIZE of what can be written, so a
+// leaked passcode can't be used to write junk or oversized documents
+// into the collections.
 // ════════════════════════════════════════════════════════════════
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Game completions — written by kids after finishing the activity.
-    // Public read so the passcode screen can show a live count.
-    // Data should stay anonymous (no personal info).
+    // ── Completions ──────────────────────────────────────────────
+    // Written by players when they finish the quiz. Public read so the
+    // passcode screen can show a live "games played" count.
+    // Must stay anonymous — no names, no personal info.
     match /completions/{docId} {
       allow read: if true;
+
       allow create: if request.auth != null
-                    && request.resource.data.createdAt is timestamp;
+                    && request.resource.data.createdAt is timestamp
+                    && validCompletion(request.resource.data);
+
       allow update, delete: if false;
     }
 
-    // Survey responses — admin-only read since responses may identify users.
-    // Anyone signed in can submit one.
+    // ── Surveys ──────────────────────────────────────────────────
+    // Free-text answers could conceivably identify someone, so these are
+    // admin-read only. Anyone signed in may submit one.
     match /surveys/{docId} {
       allow read: if isAdmin();
+
       allow create: if request.auth != null
-                    && request.resource.data.createdAt is timestamp;
+                    && request.resource.data.createdAt is timestamp
+                    && validSurvey(request.resource.data);
+
       allow update, delete: if false;
     }
 
-    // Admin whitelist — doc ID is the admin's Firebase Auth UID.
-    // Existence of the doc grants admin permission. Each admin can read
-    // their own doc to confirm membership at sign-in time.
-    // Add new admins via the Firebase Console (Firestore → admins → add doc).
+    // ── Admin whitelist ──────────────────────────────────────────
+    // Doc ID is the admin's Firebase Auth UID; the doc existing grants
+    // admin permission. Add admins via the Firebase Console only.
     match /admins/{uid} {
       allow read: if request.auth != null && request.auth.uid == uid;
       allow write: if false;
     }
 
+    // ── Validators ───────────────────────────────────────────────
+
     function isAdmin() {
       return request.auth != null
         && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    // A completion records the score plus one entry per question answered.
+    // `answers` is capped at 50 entries to keep documents small and bound
+    // what a leaked passcode could write.
+    function validCompletion(d) {
+      return d.score is number
+        && d.total is number
+        && d.score >= 0
+        && d.total > 0
+        && d.total <= 50
+        && d.score <= d.total
+        && d.answers is list
+        && d.answers.size() == d.total
+        && d.answers.size() <= 50
+        && d.durationMs is number
+        && d.durationMs >= 0
+        && d.categoryStats is map
+        && d.source is string
+        && d.source.size() <= 64
+        // Reject anything with unexpected top-level fields.
+        && d.keys().hasOnly([
+             'createdAt', 'source', 'score', 'total',
+             'durationMs', 'categoryStats', 'answers'
+           ]);
+    }
+
+    // Survey answers are all short strings from fixed choices, except the
+    // optional free-text "learning" field. Lengths are bounded so the
+    // collection can't be used as free storage.
+    function validSurvey(d) {
+      return d.keys().hasOnly([
+               'createdAt', 'source', 'completionId',
+               'confidenceBefore', 'confidenceAfter', 'feelsMoreAware',
+               'mostWorryingScam', 'difficulty', 'wouldShare', 'learning'
+             ])
+        && (!('learning' in d.keys()) || (d.learning is string && d.learning.size() <= 500))
+        && (!('completionId' in d.keys()) || (d.completionId is string && d.completionId.size() <= 64))
+        && (!('mostWorryingScam' in d.keys()) || (d.mostWorryingScam is string && d.mostWorryingScam.size() <= 64))
+        && (!('confidenceBefore' in d.keys()) || d.confidenceBefore in ['1', '2', '3', '4', '5'])
+        && (!('confidenceAfter' in d.keys()) || d.confidenceAfter in ['1', '2', '3', '4', '5'])
+        && (!('feelsMoreAware' in d.keys()) || d.feelsMoreAware in ['yes', 'somewhat', 'no'])
+        && (!('wouldShare' in d.keys()) || d.wouldShare in ['yes', 'maybe', 'no'])
+        && (!('difficulty' in d.keys()) || d.difficulty in ['easy', 'just_right', 'hard']);
     }
   }
 }
