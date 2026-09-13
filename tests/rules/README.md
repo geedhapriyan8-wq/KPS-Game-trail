@@ -18,7 +18,7 @@ npm install
 npm test
 ```
 
-Expected output ends with `15 passed, 0 failed`.
+Expected output ends with `16 passed, 0 failed`.
 
 ## What's covered
 
@@ -28,10 +28,12 @@ rejected; and malformed payloads are rejected: `score > total`, an `answers`
 array whose length doesn't match `total`, an oversized quiz, and unexpected
 extra fields.
 
-**Surveys** — the full seven-question response writes successfully; a non-admin
+**Surveys** — the full seven-question response (plus the `language` field
+recording which language the player used) writes successfully; a non-admin
 cannot read the collection back; out-of-range confidence values, invalid
-difficulty values, and 5000-character free text are all rejected; and a
-response with the optional fields omitted still writes.
+difficulty values, an invalid language code, and 5000-character free text
+are all rejected; and a response with the optional fields omitted still
+writes.
 
 **Admins** — a player cannot write themselves into the `admins` collection.
 

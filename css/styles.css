@@ -172,6 +172,32 @@ code {
   color: var(--kps-ink);   /* inherited by the SVG logo's currentColor fills */
 }
 
+.game-header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.kps-lang-select {
+  min-height: 40px;
+  padding: 0.4rem 2rem 0.4rem 0.8rem;
+  font-family: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--kps-ink);
+  background: var(--kps-white);
+  border: var(--kps-border-thin);
+  border-radius: var(--kps-radius-pill);
+  box-shadow: 2px 2px 0 0 var(--kps-black);
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231a1a1a' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.6rem center;
+  background-size: 0.9rem;
+}
+.kps-lang-select:hover { background-color: var(--kps-purple-100); }
+
 .game-area {
   max-width: 720px;
   margin: 0 auto;

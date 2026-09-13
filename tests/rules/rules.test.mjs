@@ -23,6 +23,7 @@ const answers = Array.from({ length: 10 }, (_, i) => ({
   correctIndex: 1,
   correct: true,
   timeMs: 8400,
+  language: 'en',
 }));
 
 const completion = {
@@ -39,6 +40,7 @@ const survey = {
   createdAt: serverTimestamp(),
   source: 'scam_scenario_quiz',
   completionId: 'abc123',
+  language: 'zh',
   confidenceBefore: '2',
   confidenceAfter: '4',
   feelsMoreAware: 'yes',
@@ -81,6 +83,8 @@ await check('rejects out-of-range confidence value',
   assertFails(addDoc(collection(player, 'surveys'), { ...survey, confidenceAfter: '99' })));
 await check('rejects invalid difficulty value',
   assertFails(addDoc(collection(player, 'surveys'), { ...survey, difficulty: 'sideways' })));
+await check('rejects invalid language code',
+  assertFails(addDoc(collection(player, 'surveys'), { ...survey, language: 'fr' })));
 await check('rejects 5000-char free text',
   assertFails(addDoc(collection(player, 'surveys'), { ...survey, learning: 'x'.repeat(5000) })));
 await check('accepts survey with optional fields omitted',

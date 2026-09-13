@@ -21,7 +21,12 @@
 		<section class="screen screen-game">
 			<header class="game-header">
 				<img src="/assets/kps/kps_logo.svg" alt="Kids PlaySafer" class="game-header-logo" />
-				<button type="button" id="game-signout" class="kps-link">Sign out</button>
+				<div class="game-header-actions">
+					<!-- Populated from LANGUAGES in i18n.js — never hardcode options
+					     here, so adding a language only means editing i18n.js. -->
+					<select id="language-switcher" class="kps-lang-select" aria-label="Language"></select>
+					<button type="button" id="game-signout" class="kps-link" data-i18n="signOut">Sign out</button>
+				</div>
 			</header>
 			<main class="game-area">
 				<!-- ════════════════════════════════════════════════════════
@@ -34,7 +39,7 @@
 						<!-- Deliberately NOT the scam category: naming it here would
 						     tell the player what to look for. The category is
 						     revealed in the feedback panel after they answer. -->
-						<span class="kps-quiz-prompt">Spot the scam</span>
+						<span class="kps-quiz-prompt" data-i18n="spotTheScam">Spot the scam</span>
 						<span id="quiz-counter" class="kps-quiz-counter"></span>
 					</div>
 					<div class="kps-progress-track" role="progressbar" aria-label="Quiz progress">
@@ -67,10 +72,10 @@
 		<!-- Survey form template (cloned into #survey-mount when the player completes) -->
 		<template id="survey-template">
 			<form class="kps-form kps-survey" data-survey-form>
-				<h2 class="kps-card-subtitle">Quick survey</h2>
+				<h2 class="kps-card-subtitle" data-i18n="survey.title">Quick survey</h2>
 
 				<fieldset class="kps-field">
-					<legend>Before playing, how confident were you in spotting a scam?</legend>
+					<legend data-i18n="survey.confidenceBeforeLegend">Before playing, how confident were you in spotting a scam?</legend>
 					<div class="kps-scale" role="radiogroup" aria-label="Confidence before playing, 1 to 5">
 						<label class="kps-scale-option"><input type="radio" name="confidenceBefore" value="1" required /><span>1</span></label>
 						<label class="kps-scale-option"><input type="radio" name="confidenceBefore" value="2" /><span>2</span></label>
@@ -78,11 +83,11 @@
 						<label class="kps-scale-option"><input type="radio" name="confidenceBefore" value="4" /><span>4</span></label>
 						<label class="kps-scale-option"><input type="radio" name="confidenceBefore" value="5" /><span>5</span></label>
 					</div>
-					<div class="kps-scale-labels"><span>Not confident</span><span>Very confident</span></div>
+					<div class="kps-scale-labels"><span data-i18n="survey.notConfident">Not confident</span><span data-i18n="survey.veryConfident">Very confident</span></div>
 				</fieldset>
 
 				<fieldset class="kps-field">
-					<legend>After playing, how confident do you feel now?</legend>
+					<legend data-i18n="survey.confidenceAfterLegend">After playing, how confident do you feel now?</legend>
 					<div class="kps-scale" role="radiogroup" aria-label="Confidence after playing, 1 to 5">
 						<label class="kps-scale-option"><input type="radio" name="confidenceAfter" value="1" required /><span>1</span></label>
 						<label class="kps-scale-option"><input type="radio" name="confidenceAfter" value="2" /><span>2</span></label>
@@ -90,50 +95,50 @@
 						<label class="kps-scale-option"><input type="radio" name="confidenceAfter" value="4" /><span>4</span></label>
 						<label class="kps-scale-option"><input type="radio" name="confidenceAfter" value="5" /><span>5</span></label>
 					</div>
-					<div class="kps-scale-labels"><span>Not confident</span><span>Very confident</span></div>
+					<div class="kps-scale-labels"><span data-i18n="survey.notConfident">Not confident</span><span data-i18n="survey.veryConfident">Very confident</span></div>
 				</fieldset>
 
 				<fieldset class="kps-field">
-					<legend>Do you feel more aware of common scam warning signs now?</legend>
+					<legend data-i18n="survey.feelsMoreAwareLegend">Do you feel more aware of common scam warning signs now?</legend>
 					<div class="kps-pill-group" role="radiogroup" aria-label="Feels more aware of scam warning signs">
-						<label class="kps-pill-option"><input type="radio" name="feelsMoreAware" value="yes" required /><span>Yes</span></label>
-						<label class="kps-pill-option"><input type="radio" name="feelsMoreAware" value="somewhat" /><span>Somewhat</span></label>
-						<label class="kps-pill-option"><input type="radio" name="feelsMoreAware" value="no" /><span>Not really</span></label>
+						<label class="kps-pill-option"><input type="radio" name="feelsMoreAware" value="yes" required /><span data-i18n="survey.yes">Yes</span></label>
+						<label class="kps-pill-option"><input type="radio" name="feelsMoreAware" value="somewhat" /><span data-i18n="survey.somewhat">Somewhat</span></label>
+						<label class="kps-pill-option"><input type="radio" name="feelsMoreAware" value="no" /><span data-i18n="survey.notReally">Not really</span></label>
 					</div>
 				</fieldset>
 
 				<label class="kps-field">
-					<span>Which scam worries you most in real life?</span>
+					<span data-i18n="survey.mostWorryingLabel">Which scam worries you most in real life?</span>
 					<select name="mostWorryingScam" class="kps-input" data-category-select required>
-						<option value="">Choose one...</option>
+						<option value="" data-i18n="survey.chooseOne">Choose one...</option>
 					</select>
 				</label>
 
 				<label class="kps-field">
-					<span>How did you find the activity?</span>
+					<span data-i18n="survey.difficultyLabel">How did you find the activity?</span>
 					<select name="difficulty" class="kps-input" required>
-						<option value="">Choose one...</option>
-						<option value="easy">Easy</option>
-						<option value="just_right">Just right</option>
-						<option value="hard">Hard</option>
+						<option value="" data-i18n="survey.chooseOne">Choose one...</option>
+						<option value="easy" data-i18n="survey.easy">Easy</option>
+						<option value="just_right" data-i18n="survey.justRight">Just right</option>
+						<option value="hard" data-i18n="survey.hard">Hard</option>
 					</select>
 				</label>
 
 				<fieldset class="kps-field">
-					<legend>Would you share what you learned with family or friends?</legend>
+					<legend data-i18n="survey.wouldShareLegend">Would you share what you learned with family or friends?</legend>
 					<div class="kps-pill-group" role="radiogroup" aria-label="Would share what they learned">
-						<label class="kps-pill-option"><input type="radio" name="wouldShare" value="yes" required /><span>Yes</span></label>
-						<label class="kps-pill-option"><input type="radio" name="wouldShare" value="maybe" /><span>Maybe</span></label>
-						<label class="kps-pill-option"><input type="radio" name="wouldShare" value="no" /><span>No</span></label>
+						<label class="kps-pill-option"><input type="radio" name="wouldShare" value="yes" required /><span data-i18n="survey.yes">Yes</span></label>
+						<label class="kps-pill-option"><input type="radio" name="wouldShare" value="maybe" /><span data-i18n="survey.maybe">Maybe</span></label>
+						<label class="kps-pill-option"><input type="radio" name="wouldShare" value="no" /><span data-i18n="survey.no">No</span></label>
 					</div>
 				</fieldset>
 
 				<label class="kps-field">
-					<span>One thing you learned (optional)</span>
-					<input name="learning" type="text" class="kps-input" placeholder="Type your answer..." />
+					<span data-i18n="survey.learningLabel">One thing you learned (optional)</span>
+					<input name="learning" type="text" class="kps-input" placeholder="Type your answer..." data-i18n-placeholder="survey.learningPlaceholder" />
 				</label>
 
-				<button type="submit" class="kps-btn kps-btn-primary">Submit</button>
+				<button type="submit" class="kps-btn kps-btn-primary" data-i18n="survey.submit">Submit</button>
 				<p class="kps-info" data-survey-status hidden></p>
 			</form>
 		</template>

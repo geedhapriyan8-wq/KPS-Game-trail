@@ -204,30 +204,45 @@ without having to reverse-engineer it.
 
 | File | What it's for |
 |---|---|
-| `js/pages/game/questions.js` | The question bank: all scenarios, the `CATEGORIES` map, and `getRandomQuiz()` which builds one randomized playthrough. **This is the file you edit to add/change questions or categories.** |
-| `js/pages/game/index.js` | Quiz engine: renders one question at a time, scores answers, fires analytics, saves the completion doc, then hands off to the existing survey. You shouldn't need to touch this to add content — only if you're changing *how* the quiz behaves. |
-| `game/index.html` | The quiz/result card markup (`#quiz-screen`, `#quiz-result`) plus the existing survey `<template>`. |
-| `css/styles.css` | `.kps-quiz-option`, `.kps-quiz-card`, `.kps-quiz-meta` / `.kps-category-badge` / `.kps-quiz-counter` / `.kps-progress-track` / `.kps-progress-fill`, and the `.screen-game` background rules. |
+| `js/pages/game/questions.js` | The question bank (50 questions, English — the canonical source of truth), the `CATEGORIES` map, and `getRandomQuiz()` which builds one randomized 6-question playthrough. **This is the file you edit to add/change questions or categories.** |
+| `js/pages/game/i18n.js` | UI string translations (4 languages) and question-content translations (Chinese/Malay/Tamil), keyed by question id. **Edit this to add a language or translate a question.** |
+| `js/pages/game/index.js` | Quiz engine: renders one question at a time, scores answers, fires analytics, saves the completion doc, then hands off to the existing survey. Also drives the language switcher. You shouldn't need to touch this to add content — only if you're changing *how* the quiz behaves. |
+| `game/index.html` | The quiz/result card markup (`#quiz-screen`, `#quiz-result`), the language `<select>`, and the survey `<template>`. Translatable static text is marked with `data-i18n="key"`. |
+| `css/styles.css` | `.kps-quiz-option`, `.kps-quiz-card`, `.kps-quiz-meta` / `.kps-quiz-prompt` / `.kps-quiz-counter` / `.kps-progress-track` / `.kps-progress-fill`, `.kps-lang-select`, and the `.screen-game` background rules. |
 | `assets/kps/quiz-bg-tile.png` | The repeating mascot-sticker background tile behind the game screen. |
-| `assets/kps/categories/*.png` | Full-opacity category mascot art (love, impersonation, investment, ecommerce), cropped from the original card illustrations. Used both to build the background tile and as the small icon shown next to the category name during play. |
+| `assets/kps/categories/*.png` | Full-opacity category mascot art (love, impersonation, investment, ecommerce), cropped from the original card illustrations. Used both to build the background tile and as the small icon shown next to the category name on the results breakdown. |
 
 ### Question bank & categories
 
-Each question in `QUESTIONS` (in `questions.js`) looks like:
+The bank has **50 questions — 10 per category** (impersonation, blessing,
+love, investment, ecommerce). Each one in `QUESTIONS` (in `questions.js`)
+looks like:
 
 ```javascript
 {
   category: 'impersonation',       // must match a key in CATEGORIES
+  id: 'imp-01',                    // stable, unique — see the file header
   scenario: 'The situation...',
   options: ['choice A', 'choice B', 'choice C', 'choice D'],
-  correctIndex: 1,                 // index into options[]
+  correctIndex: 2,                 // index into options[] — VARY this, see below
   explanation: 'Why that answer is right — shown after the player answers',
 }
 ```
 
+**Vary `correctIndex` across your questions.** An earlier version of this
+bank had every single question's correct answer at index 1 — the generator
+script that wrote the content hardcoded it. That's a real, serious bug, not
+a cosmetic one: it makes the quiz solvable by always picking option B
+without reading anything. It was caught by actually playing the quiz in a
+browser and logging which position won across several rounds, not by
+reading the code. The bank now has a checked, balanced distribution
+(roughly 12–13 questions at each of the four positions). **If you add new
+questions, deliberately place the correct answer at different positions
+across them** — don't default to always writing it as option A or B.
+
 `CATEGORIES` maps each category key to a display label, emoji, optional
 icon image path, and the two colors used to theme its badge (see
-[Category badge & progress bar](#category-badge--progress-bar) below):
+[Question header & progress bar](#question-header--progress-bar) below):
 
 ```javascript
 export const CATEGORIES = {
@@ -253,40 +268,122 @@ export const CATEGORIES = {
 `label`, `emoji`, `color`, and `colorDark`. If you have mascot artwork for
 it, drop the PNG in `assets/kps/categories/` and point `icon` at it —
 otherwise leave `icon: null` and the badge shows the emoji instead. Then
-add questions with that `category` key to `QUESTIONS`. No other code
-changes needed — the badge picks up the new colors and icon/emoji
-automatically.
+add questions with that `category` key to `QUESTIONS`, each with a unique
+`id` following the `xxx-NN` convention (e.g. `bls-11` for an 11th blessing
+question). No other code changes needed for English. **If you want the new
+questions available in the other three languages too**, add matching
+entries to `zh` / `ms` / `ta` in `i18n.js` — see
+[Translations](#translations) below. Until you do, players in those
+languages will simply see the new questions in English (safe fallback, but
+inconsistent, so don't leave it that way for long).
 
-**To add more questions to an existing category:** just push more objects
-into `QUESTIONS` with that `category`. Nothing else needs to change.
+**To add more questions to an existing category:** same as above — push a
+new object into `QUESTIONS` with a fresh `id`, and optionally add its
+translation to `i18n.js`.
 
 ### Randomization
 
-`getRandomQuiz(perCategory = 2)` (bottom of `questions.js`) builds one
-quiz playthrough:
+`getRandomQuiz(total = 6)` (bottom of `questions.js`) builds one quiz
+playthrough:
 
-1. Groups all questions by category.
-2. Shuffles each category's pool independently (Fisher–Yates) and takes up
-   to `perCategory` from each — so every playthrough still covers every
-   scam type, it's just *which* questions and in *what order* that varies.
-3. Shuffles the combined list so categories don't always appear in the
-   same sequence.
+1. Groups all questions by category and shuffles each category's pool
+   independently (Fisher–Yates).
+2. Walks the categories in shuffled rounds, taking one not-yet-used
+   question from each per round, until `total` questions are picked. With
+   5 categories and `total = 6`, every playthrough covers all 5 categories
+   once, plus one extra question from a randomly-chosen 6th slot — so which
+   category gets the "bonus" question differs every time.
+3. Shuffles the final list so categories don't always appear in the same
+   sequence.
 
-`index.js` calls this once per page load (`const quizQuestions = getRandomQuiz();`).
-As the question bank grows, this automatically starts drawing from a
-bigger pool — you don't need to change the randomization logic.
+This works cleanly for any `total`, not just numbers that divide evenly by
+the category count — `getRandomQuiz(12)` would give every category
+either 2 or 3 questions, `getRandomQuiz(3)` would give 3 different
+categories one question each, and so on.
+
+`index.js` calls this once per page load (`const quizQuestions =
+getRandomQuiz();`, using the default of 6). As the question bank grows,
+this automatically starts drawing from a bigger pool — you don't need to
+change the randomization logic. Note that a language switch does **not**
+call this again — it only changes which language the same 6 questions are
+displayed in (see [Translations](#translations)).
+
+### Translations
+
+The quiz supports four languages: English, Chinese, Malay, Tamil — a
+language `<select>` in the game header lets the player switch anytime,
+including mid-question or after finishing. The player's choice is
+remembered (`localStorage`) for their next visit.
+
+**Translation quality note:** the Chinese/Malay/Tamil text in `i18n.js` was
+produced by an AI assistant, not reviewed by a native speaker. The meaning
+and the correct answer are preserved carefully, but for safety-education
+content aimed at seniors, get a native speaker to review each language
+before relying on it in front of real users — Tamil especially, since it's
+the language furthest from the assistant's strongest training data. Treat
+what's there as a complete, working first draft, not final copy.
+
+**How it's structured**, all in `js/pages/game/i18n.js`:
+
+- `LANGUAGES` — the 4 supported languages, each with a `nativeLabel` (e.g.
+  `தமிழ்`) used in the switcher itself, so a Tamil speaker can find their
+  language regardless of what language the UI currently happens to be in.
+- `UI_STRINGS` — every piece of interface chrome (buttons, labels, survey
+  questions) in all 4 languages, looked up via `getUIString(lang, 'key.path',
+  vars)`. Dotted paths reach nested keys (`'survey.submit'`); `{n}`-style
+  placeholders in a string are filled from `vars`
+  (`getUIString('zh', 'questionOf', { n: 1, total: 6 })`).
+- `zh` / `ms` / `ta` — question-content translations, one object keyed by
+  question `id`, each holding a translated `scenario`, `options[]`, and
+  `explanation`. **`correctIndex` and `category` are never translated** —
+  they're scoring/analytics data, not display text — so `options[]` in
+  every language must stay in the exact same order as the English
+  original, index-for-index. Get this wrong and the translated quiz will
+  show a different answer as "correct" than the English version does.
+- `translateQuestion(question, lang)` — returns a display copy of a
+  question with `scenario`/`options`/`explanation` swapped to the target
+  language, falling back field-by-field to English if a translation is
+  missing or incomplete. `index.js` always keeps a reference to the
+  original (English) question object alongside the translated display
+  copy — scoring, `categoryStats`, and the Firestore `answers` log always
+  use the original, never the translated one.
+- `getCategoryLabel(lang, categoryKey)` — translated category name (no
+  emoji), used on the results breakdown and the feedback panel's category
+  tag.
+
+**How the page's static text gets translated:** any element in
+`game/index.html` with `data-i18n="some.key"` gets its `textContent` set
+from `UI_STRINGS` on load and on every language switch; `data-i18n-placeholder="some.key"`
+does the same for an `<input>` placeholder. `index.js`'s
+`translateStaticText()` does this in one pass over the whole document —
+so adding a new static string is: add the key to `UI_STRINGS` in all 4
+languages, add `data-i18n="that.key"` to the element in the HTML, done.
+
+**Why a language switch doesn't lose your progress:** switching mid-quiz
+re-renders the *current* question's text in the new language but does not
+reset `current`, `score`, or which answer you already picked — `index.js`
+tracks `answeredIndex` for the question on screen, and re-render replays
+the "answered" visual state (colours, ✓/✗ marks, revealed explanation) in
+the new language rather than scoring the question again. This was
+specifically tested in a real browser: answer a question, switch language,
+confirm the mark and score didn't change and only the text did. If you
+modify the render logic, re-check this — it's easy to accidentally
+re-score on a language switch if the answered/unanswered state and the
+scoring logic aren't kept separate.
 
 ### Question header & progress bar
 
 Each question screen shows a header row (`.kps-quiz-meta`) with two elements:
 
-- **A neutral "Spot the scam" label** (`.kps-quiz-prompt`). This is
+- **A neutral "Spot the scam" label** (`.kps-quiz-prompt`, `data-i18n="spotTheScam"`). This is
   deliberately **not** the scam category. Naming the category up front
   ("Love Scam") tells the player exactly what to look for and makes the
   question far easier than the real-life situation would be — it gives the
   answer away. Don't put the category here, and keep it out of the scenario
   text too.
-- **`#quiz-counter`** — "Question X of Y", plain text.
+- **`#quiz-counter`** — "Question X of Y", built from
+  `getUIString(lang, 'questionOf', { n, total })` (see
+  [Translations](#translations)) so it reads correctly in all 4 languages.
 
 Below that, `.kps-progress-track` / `#quiz-progress-fill` shows how far through
 the quiz the player is, with `aria-valuenow` kept in sync for screen readers.
@@ -435,23 +532,24 @@ Two collections capture everything the quiz produces. Both are written by
 {
   createdAt: <serverTimestamp>,
   source: 'scam_scenario_quiz',
-  score: 8,
-  total: 10,
-  durationMs: 143201,
+  score: 5,
+  total: 6,
+  durationMs: 98120,
   categoryStats: {
-    impersonation: { correct: 2, total: 2 },
+    impersonation: { correct: 1, total: 1 },
     blessing:      { correct: 1, total: 2 },
     // ... one entry per category the player saw
   },
   answers: [
     {
-      questionId: 'blessing-02',  // stable id from questions.js
+      questionId: 'bls-02',       // stable id from questions.js
       category: 'blessing',
       position: 1,                // where it fell in this playthrough
       selectedIndex: 0,           // what they picked
       correctIndex: 1,            // what was right
       correct: false,
       timeMs: 12480,              // time spent on this question
+      language: 'en',             // which language they were shown it in
     },
     // ... one entry per question
   ],
@@ -461,7 +559,10 @@ Two collections capture everything the quiz produces. Both are written by
 `answers` is the important addition: it records **every individual right and
 wrong answer**, not just the total. Because `selectedIndex` is stored, you can
 see *which wrong option* people pick — that tells you whether a distractor is
-genuinely tempting (useful) or just confusing (needs rewriting).
+genuinely tempting (useful) or just confusing (needs rewriting). `language`
+records what the player was reading at the time, in case scores end up
+differing meaningfully by language (which itself would be worth a look — it
+could mean a translation is unclear, not that the player is struggling).
 
 Public read is allowed so the passcode screen can show a live "games played"
 count. Keep this collection anonymous — no names, no personal details.
@@ -473,6 +574,7 @@ count. Keep this collection anonymous — no names, no personal details.
   createdAt: <serverTimestamp>,
   source: 'scam_scenario_quiz',
   completionId: 'AbC123...',      // links to the completion above
+  language: 'zh',                 // which language the survey itself was answered in
   confidenceBefore: '2',
   confidenceAfter: '4',
   feelsMoreAware: 'yes',
@@ -658,18 +760,15 @@ the element:
 The PNG is kept in the repo for anywhere an SVG isn't usable (email, social
 cards). Prefer the SVG on the web.
 
-### Local visual preview
+### Manual preview without Firebase
 
-`preview.html` renders the real quiz markup, CSS, and question bank with
-Firebase stubbed out, so you can check design changes without logging in or
-writing test rows to Firestore. With the dev server running:
-
-- `/preview.html` — a question, unanswered
-- `/preview.html?answered=1` — the revealed correct/incorrect state
-- `/preview.html?screen=result` — the results breakdown and full survey
-
-It's excluded from deploys in both `firebase.json` and `.vercelignore`, so it
-never ships. Delete it if you'd rather not keep it.
+See `tests/manual-preview/README.md` for a copy-paste way to run the real
+`game/index.html` / `index.js` against a stubbed Firebase layer, so you can
+check quiz or design changes without logging in or writing test rows to
+Firestore. It works against a throwaway copy of the whole project rather
+than a hand-maintained duplicate of the markup — an earlier version of this
+repo had exactly that (a `preview.html` with copied-in markup), and it
+silently went out of sync with the real page. Prefer the stub approach.
 
 ### The feedback survey
 
@@ -869,20 +968,23 @@ kps-project-template/
 │   │   ├── auth.js         ← passcode + admin auth flows
 │   │   ├── db.js           ← dbHelpers.add/list/set/count/remove
 │   │   └── analytics.js    ← logKpsEvent
-│   └── pages/              ← one JS file per HTML page (mirrors HTML layout)
-│       ├── index.js        ← drives index.html
-│       ├── game/
-│       │   ├── index.js     ← quiz engine — drives game/index.html
-│       │   └── questions.js ← question bank + CATEGORIES + getRandomQuiz() — edit this to add content
-│       └── admin/
-│           ├── index.js    ← drives admin/index.html
-│           └── dashboard.js ← drives admin/dashboard.html
+│	└── pages/              ← one JS file per HTML page (mirrors HTML layout)
+│	    ├── index.js        ← drives index.html
+│	    ├── game/
+│	    │   ├── index.js     ← quiz engine + language switcher — drives game/index.html
+│	    │   ├── questions.js ← question bank (50 Qs) + CATEGORIES + getRandomQuiz() — edit to add content
+│	    │   └── i18n.js      ← UI strings + question translations (en/zh/ms/ta) — edit to add a language
+│	    └── admin/
+│	        ├── index.js    ← drives admin/index.html
+│	        └── dashboard.js ← drives admin/dashboard.html
 ├── assets/kps/             ← logo + favicon
 │   ├── kps_logo.svg        ← vector logo (use this on the web; fills with currentColor)
 │   ├── kps_logo.png        ← original raster logo, kept for non-web use
 │   ├── quiz-bg-tile.png    ← repeating mascot background tile for the game screen
 │   └── categories/         ← full-opacity category mascot art (love, impersonation, investment, ecommerce)
-├── preview.html            ← local-only visual preview, excluded from deploys
+├── tests/
+│   ├── rules/              ← Firestore rules tests against real payloads (see its README)
+│   └── manual-preview/     ← how to run the real game against stubbed Firebase, no login needed
 ├── firestore.rules         ← Firestore access rules (read this!)
 ├── firebase.json           ← hosting + Firestore config (used at deploy)
 └── .firebaserc             ← Firebase project ID

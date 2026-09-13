@@ -95,10 +95,11 @@ service cloud.firestore {
     // collection can't be used as free storage.
     function validSurvey(d) {
       return d.keys().hasOnly([
-               'createdAt', 'source', 'completionId',
+               'createdAt', 'source', 'completionId', 'language',
                'confidenceBefore', 'confidenceAfter', 'feelsMoreAware',
                'mostWorryingScam', 'difficulty', 'wouldShare', 'learning'
              ])
+        && (!('language' in d.keys()) || d.language in ['en', 'zh', 'ms', 'ta'])
         && (!('learning' in d.keys()) || (d.learning is string && d.learning.size() <= 500))
         && (!('completionId' in d.keys()) || (d.completionId is string && d.completionId.size() <= 64))
         && (!('mostWorryingScam' in d.keys()) || (d.mostWorryingScam is string && d.mostWorryingScam.size() <= 64))
