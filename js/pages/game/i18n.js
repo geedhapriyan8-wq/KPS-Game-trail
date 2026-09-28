@@ -63,7 +63,9 @@ export const UI_STRINGS = {
     scoreLabel: 'scams correctly identified',
     breakdownTitle: 'How you did by scam type',
     completionRecorded: 'Completion recorded!',
-    completionFailed: 'Could not record completion.',
+    completionFailed: "Your result couldn't be saved. Check your internet connection, then play again to record it.",
+    leaveQuizConfirm: "Leave the quiz? Your answers so far won't be saved.",
+    yourAnswer: 'Your answer',
     languageLabel: 'Language',
     categories: {
       impersonation: 'Impersonation',
@@ -116,7 +118,9 @@ export const UI_STRINGS = {
     scoreLabel: '成功识破的骗局数',
     breakdownTitle: '各类骗局的表现',
     completionRecorded: '已记录完成情况！',
-    completionFailed: '无法记录完成情况。',
+    completionFailed: '无法保存您的成绩。请检查网络连接，然后重新游戏以记录成绩。',
+    leaveQuizConfirm: '要离开测验吗？您目前的答案将不会被保存。',
+    yourAnswer: '您的答案',
     languageLabel: '语言',
     categories: {
       impersonation: '冒充诈骗',
@@ -169,7 +173,9 @@ export const UI_STRINGS = {
     scoreLabel: 'penipuan berjaya dikenal pasti',
     breakdownTitle: 'Prestasi anda mengikut jenis penipuan',
     completionRecorded: 'Penyelesaian telah direkodkan!',
-    completionFailed: 'Tidak dapat merekod penyelesaian.',
+    completionFailed: 'Keputusan anda tidak dapat disimpan. Semak sambungan internet anda, kemudian main semula untuk merekodkannya.',
+    leaveQuizConfirm: 'Tinggalkan kuiz? Jawapan anda setakat ini tidak akan disimpan.',
+    yourAnswer: 'Jawapan anda',
     languageLabel: 'Bahasa',
     categories: {
       impersonation: 'Penyamaran',
@@ -222,7 +228,9 @@ export const UI_STRINGS = {
     scoreLabel: 'சரியாக அடையாளம் கண்ட மோசடிகள்',
     breakdownTitle: 'மோசடி வகை வாரியான உங்கள் செயல்திறன்',
     completionRecorded: 'நிறைவு பதிவு செய்யப்பட்டது!',
-    completionFailed: 'நிறைவை பதிவு செய்ய முடியவில்லை.',
+    completionFailed: 'உங்கள் முடிவைச் சேமிக்க முடியவில்லை. இணைய இணைப்பைச் சரிபார்த்து, பதிவு செய்ய மீண்டும் விளையாடுங்கள்.',
+    leaveQuizConfirm: 'வினாடி வினாவிலிருந்து வெளியேறவா? இதுவரை உங்கள் பதில்கள் சேமிக்கப்படாது.',
+    yourAnswer: 'உங்கள் பதில்',
     languageLabel: 'மொழி',
     categories: {
       impersonation: 'போலியாக நடிக்கும் மோசடி',

@@ -31,28 +31,28 @@
 					<a href="/admin/dashboard.html" class="admin-nav-item admin-nav-item-active">Survey</a>
 				</nav>
 
-				<button type="button" id="signout-btn" class="admin-signout">Sign Out</button>
+				<button type="button" id="signout-btn" class="admin-signout">Sign out</button>
 			</aside>
 
 			<!-- Main content -->
 			<main class="admin-main">
 				<div class="admin-page-header">
 					<div>
-						<h1 class="admin-page-title" id="page-title">Survey Responses</h1>
-						<p class="admin-page-stat"><strong>Total Completions:</strong> <span id="total-completions">—</span></p>
-						<p class="admin-page-stat"><strong>Total Surveys:</strong> <span id="total-surveys">—</span></p>
+						<h1 class="admin-page-title" id="page-title">Survey responses</h1>
+						<p class="admin-page-stat"><strong>Total completions:</strong> <span id="total-completions">—</span></p>
+						<p class="admin-page-stat"><strong>Total surveys:</strong> <span id="total-surveys">—</span></p>
 					</div>
 					<div class="admin-page-actions">
-						<button type="button" id="export-btn" class="kps-btn kps-btn-success">Export All (.xlsx)</button>
+						<button type="button" id="export-btn" class="kps-btn kps-btn-primary">Export all (.xlsx)</button>
 						<button type="button" id="refresh-btn" class="kps-btn kps-btn-secondary">Refresh</button>
 					</div>
 				</div>
 
 				<!-- Switches the table below between the three views. -->
-				<div class="admin-tabs" role="tablist" aria-label="Data view">
-					<button type="button" class="admin-tab admin-tab-active" role="tab" data-view="surveys" aria-selected="true">Surveys</button>
-					<button type="button" class="admin-tab" role="tab" data-view="completions" aria-selected="false">Completions</button>
-					<button type="button" class="admin-tab" role="tab" data-view="questions" aria-selected="false">Question accuracy</button>
+				<div class="admin-tabs" role="group" aria-label="Data view">
+					<button type="button" class="admin-tab admin-tab-active" data-view="surveys" aria-pressed="true">Surveys</button>
+					<button type="button" class="admin-tab" data-view="completions" aria-pressed="false">Completions</button>
+					<button type="button" class="admin-tab" data-view="questions" aria-pressed="false">Question accuracy</button>
 				</div>
 
 				<div class="admin-data-card" id="survey-container">

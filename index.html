@@ -21,18 +21,19 @@
 		<section class="screen">
 			<div class="kps-card">
 				<img src="/assets/kps/kps_logo.svg" alt="Kids PlaySafer" class="kps-card-logo" />
-				<h1 class="kps-card-title">Enter Passcode</h1>
+				<h1 class="kps-card-title">Enter passcode</h1>
 				<form id="passcode-form" class="kps-form">
+					<label for="passcode-input" class="kps-label">Passcode</label>
 					<input
 						id="passcode-input"
 						type="password"
 						class="kps-input"
-						placeholder="Passcode"
 						autocomplete="current-password"
+						aria-describedby="passcode-error"
 						required
 					/>
-					<p id="passcode-error" class="kps-error" hidden></p>
-					<button type="submit" class="kps-btn kps-btn-primary">Play Game</button>
+					<p id="passcode-error" class="kps-error" role="alert" hidden></p>
+					<button type="submit" class="kps-btn kps-btn-primary">Play game</button>
 				</form>
 				<p id="completion-count" class="kps-count-badge">&nbsp;</p>
 			</div>
