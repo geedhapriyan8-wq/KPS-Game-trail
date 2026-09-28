@@ -45,6 +45,7 @@ if (!user) {
 
 function initGame() {
   let currentLang = getStoredLanguage();
+  document.documentElement.lang = currentLang;
 
   const langSelect = document.getElementById('language-switcher');
   Object.values(LANGUAGES).forEach((lang) => {
@@ -60,6 +61,10 @@ function initGame() {
 
   const signoutBtn = document.getElementById('game-signout');
   signoutBtn.addEventListener('click', async () => {
+    // Answers are only saved when the quiz finishes, so leaving mid-quiz
+    // loses them — confirm first.
+    const inProgress = !quizFinished && (current > 0 || answeredIndex !== null);
+    if (inProgress && !window.confirm(getUIString(currentLang, 'leaveQuizConfirm'))) return;
     await signOutUser();
     window.location.href = '/';
   });
@@ -242,6 +247,7 @@ function initGame() {
 
     const displayQ = translateQuestion(q, currentLang);
     showAnsweredState(q, displayQ, index);
+    announce(feedbackEl.textContent);
     nextBtn.focus({ preventScroll: true });
   }
 
@@ -265,7 +271,11 @@ function initGame() {
       } else if (i === index) {
         child.classList.add('is-incorrect');
         if (key) key.textContent = '✗';
-        child.setAttribute('aria-label', displayQ.options[i]);
+        // The ✗ is aria-hidden, so name the state for screen readers too.
+        child.setAttribute(
+          'aria-label',
+          `${getUIString(currentLang, 'yourAnswer')}, ${getUIString(currentLang, 'incorrectVerdict').trim()} ${displayQ.options[i]}`
+        );
       }
     });
 
@@ -300,6 +310,9 @@ function initGame() {
     answeredIndex = null;
     if (current < quizQuestions.length) {
       renderQuestion();
+      // Next was just hidden while focused; move focus to the new scenario
+      // so keyboard and screen-reader users start at the question.
+      scenarioEl.focus();
     } else {
       await finishQuiz();
     }
@@ -315,7 +328,9 @@ function initGame() {
     resultTier = ratio === 1 ? 'perfect' : ratio >= 0.7 ? 'good' : 'ok';
 
     renderResultsText();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+    resultTitleEl.focus({ preventScroll: true });
 
     try {
       const completionId = await dbHelpers.add(COLLECTIONS.COMPLETIONS, {
@@ -331,6 +346,7 @@ function initGame() {
       statusKey = 'completionRecorded';
       status.textContent = getUIString(currentLang, statusKey);
       status.hidden = false;
+      announce(status.textContent);
       // The survey stores this id so responses can be joined back to the
       // player's actual answers when you analyse the data.
       mountSurvey(surveyMount, completionIdForSurvey, currentLang);
@@ -338,6 +354,7 @@ function initGame() {
       statusKey = 'completionFailed';
       status.textContent = getUIString(currentLang, statusKey);
       status.hidden = false;
+      announce(status.textContent);
       // The survey still matters even if the completion write failed, so it is
       // mounted either way rather than being lost to a network error.
       mountSurvey(surveyMount, null, currentLang);
@@ -421,6 +438,19 @@ function initGame() {
 }
 
 /**
+ * Reads `text` out through the page's always-present #sr-status live region.
+ * Cleared first so the same message twice in a row is still announced.
+ */
+function announce(text) {
+  const region = document.getElementById('sr-status');
+  if (!region) return;
+  region.textContent = '';
+  requestAnimationFrame(() => {
+    region.textContent = text;
+  });
+}
+
+/**
  * Builds/refreshes the "which scam worries you most" <select> options from
  * CATEGORIES + the current language, so it can never drift out of sync with
  * the question bank and re-populates correctly on a language switch.
@@ -501,10 +531,12 @@ function mountSurvey(container, completionId, lang) {
       logKpsEvent(EVENTS.SURVEY_COMPLETED);
       status.textContent = getUIString(lang, 'survey.thanks');
       status.hidden = false;
+      announce(status.textContent);
       form.querySelectorAll('input, select, button').forEach((el) => (el.disabled = true));
     } catch {
       status.textContent = getUIString(lang, 'survey.submitFailed');
       status.hidden = false;
+      announce(status.textContent);
       submitBtn.disabled = false;
       submitBtn.textContent = getUIString(lang, 'survey.submit');
     }

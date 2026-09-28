@@ -21,14 +21,16 @@
 		<section class="screen">
 			<div class="kps-card">
 				<img src="/assets/kps/kps_logo.svg" alt="Kids PlaySafer" class="kps-card-logo" />
-				<h1 class="kps-card-title">Admin Login</h1>
+				<h1 class="kps-card-title">Admin login</h1>
 				<form id="admin-form" class="kps-form">
-					<input id="admin-email" type="email" class="kps-input" placeholder="Email" autocomplete="email" required />
-					<input id="admin-password" type="password" class="kps-input" placeholder="Password" autocomplete="current-password" required />
-					<p id="admin-error" class="kps-error" hidden></p>
-					<button type="submit" class="kps-btn kps-btn-primary">Sign In</button>
+					<label for="admin-email" class="kps-label">Email</label>
+					<input id="admin-email" type="email" class="kps-input" placeholder="name@example.com" autocomplete="email" aria-describedby="admin-error" required />
+					<label for="admin-password" class="kps-label">Password</label>
+					<input id="admin-password" type="password" class="kps-input" autocomplete="current-password" aria-describedby="admin-error" required />
+					<p id="admin-error" class="kps-error" role="alert" hidden></p>
+					<button type="submit" class="kps-btn kps-btn-primary">Sign in</button>
 					<a href="#" id="forgot-link" class="kps-link">Forgot password?</a>
-					<p id="forgot-status" class="kps-info" hidden></p>
+					<p id="forgot-status" class="kps-info" role="status" hidden></p>
 				</form>
 			</div>
 		</section>

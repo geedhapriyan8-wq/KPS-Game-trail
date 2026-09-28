@@ -34,6 +34,8 @@ function initForm() {
     e.preventDefault();
     errorEl.hidden = true;
     forgotStatus.hidden = true;
+    emailInput.removeAttribute('aria-invalid');
+    passwordInput.removeAttribute('aria-invalid');
     submitBtn.disabled = true;
     submitBtn.textContent = 'Signing in...';
     logKpsEvent(EVENTS.ADMIN_LOGIN_ATTEMPT);
@@ -44,10 +46,15 @@ function initForm() {
     } catch (err) {
       logKpsEvent(EVENTS.ADMIN_LOGIN_FAILURE, { code: err.code || 'unknown' });
       errorEl.textContent =
-        err.code === 'kps/not-admin' ? 'Not an admin account.' : 'Wrong email or password.';
+        err.code === 'kps/not-admin'
+          ? "This account isn't an admin. Sign in with an admin email instead."
+          : 'Check your email and password, or use "Forgot password?" below to reset it.';
       errorEl.hidden = false;
+      emailInput.setAttribute('aria-invalid', 'true');
+      passwordInput.setAttribute('aria-invalid', 'true');
+      emailInput.focus();
       submitBtn.disabled = false;
-      submitBtn.textContent = 'Sign In';
+      submitBtn.textContent = 'Sign in';
     }
   });
 

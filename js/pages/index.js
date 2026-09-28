@@ -31,6 +31,7 @@ function initForm() {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     errorEl.hidden = true;
+    input.removeAttribute('aria-invalid');
     submitBtn.disabled = true;
     submitBtn.textContent = 'Loading...';
     logKpsEvent(EVENTS.LOGIN_ATTEMPT);
@@ -42,10 +43,11 @@ function initForm() {
       logKpsEvent(EVENTS.LOGIN_FAILURE, { code: err.code || 'unknown' });
       errorEl.textContent = 'Wrong passcode — try again.';
       errorEl.hidden = false;
+      input.setAttribute('aria-invalid', 'true');
       input.value = '';
       input.focus();
       submitBtn.disabled = false;
-      submitBtn.textContent = 'Play Game';
+      submitBtn.textContent = 'Play game';
     }
   });
 }

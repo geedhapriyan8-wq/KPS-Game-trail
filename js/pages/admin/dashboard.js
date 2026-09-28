@@ -77,12 +77,12 @@ function initDashboard() {
       document.querySelectorAll('.admin-tab').forEach((t) => {
         const on = t === tab;
         t.classList.toggle('admin-tab-active', on);
-        t.setAttribute('aria-selected', String(on));
+        t.setAttribute('aria-pressed', String(on));
       });
       pageTitle.textContent = {
-        surveys: 'Survey Responses',
-        completions: 'Quiz Completions',
-        questions: 'Question Accuracy',
+        surveys: 'Survey responses',
+        completions: 'Quiz completions',
+        questions: 'Question accuracy',
       }[activeView];
       currentPage = 1;
       renderPage();
@@ -113,7 +113,7 @@ function initDashboard() {
       renderPage();
     } catch (err) {
       console.error(err);
-      container.innerHTML = '<p class="kps-info admin-empty">Failed to load data.</p>';
+      container.innerHTML = '<p class="kps-info admin-empty">Unable to load data. Check your connection, then select Refresh.</p>';
     }
   }
 
@@ -223,7 +223,7 @@ function initDashboard() {
 
     const headerCells = [
       ...(hasDate ? ['<th>Date</th>'] : []),
-      ...columns.map((c) => `<th>${escapeHtml(c)}</th>`),
+      ...columns.map((c) => `<th>${escapeHtml(columnLabel(c))}</th>`),
     ].join('');
 
     const bodyRows = items
@@ -286,7 +286,7 @@ function initDashboard() {
       XLSX.writeFile(wb, filename);
     } catch (err) {
       console.error(err);
-      alert('Could not export. See console for details.');
+      alert('Unable to export. Check your connection and try again.');
     } finally {
       exportBtn.disabled = false;
       exportBtn.textContent = original;
@@ -294,6 +294,12 @@ function initDashboard() {
   }
 
   // ── Helpers ─────────────────────────────────
+  /** Field key → readable header: 'mostWorryingScam' → 'Most worrying scam'. */
+  function columnLabel(key) {
+    const words = key.replace(/_/g, ' ').replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase();
+    return words.charAt(0).toUpperCase() + words.slice(1);
+  }
+
   function formatDate(ts) {
     if (!ts) return '';
     const d = typeof ts.toDate === 'function' ? ts.toDate() : new Date(ts);

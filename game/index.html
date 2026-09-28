@@ -45,14 +45,14 @@
 					<div class="kps-progress-track" role="progressbar" aria-label="Quiz progress">
 						<div id="quiz-progress-fill" class="kps-progress-fill"></div>
 					</div>
-					<h1 id="quiz-scenario" class="kps-card-title"></h1>
+					<h1 id="quiz-scenario" class="kps-card-title" tabindex="-1"></h1>
 					<div id="quiz-options" class="kps-quiz-options"></div>
-					<p id="quiz-feedback" class="kps-quiz-feedback" role="status" aria-live="polite" hidden></p>
+					<p id="quiz-feedback" class="kps-quiz-feedback" hidden></p>
 					<button type="button" id="quiz-next" class="kps-btn kps-btn-primary" hidden>Next</button>
 				</div>
 
 				<div id="quiz-result" class="kps-card kps-quiz-card" hidden>
-					<h1 id="quiz-result-title" class="kps-card-title">Nice work!</h1>
+					<h1 id="quiz-result-title" class="kps-card-title" tabindex="-1">Nice work!</h1>
 					<div class="kps-score-hero">
 						<span id="quiz-score-value" class="kps-score-value"></span>
 						<span id="quiz-score-label" class="kps-score-label"></span>
@@ -76,7 +76,7 @@
 
 				<fieldset class="kps-field">
 					<legend data-i18n="survey.confidenceBeforeLegend">Before playing, how confident were you in spotting a scam?</legend>
-					<div class="kps-scale" role="radiogroup" aria-label="Confidence before playing, 1 to 5">
+					<div class="kps-scale">
 						<label class="kps-scale-option"><input type="radio" name="confidenceBefore" value="1" required /><span>1</span></label>
 						<label class="kps-scale-option"><input type="radio" name="confidenceBefore" value="2" /><span>2</span></label>
 						<label class="kps-scale-option"><input type="radio" name="confidenceBefore" value="3" /><span>3</span></label>
@@ -88,7 +88,7 @@
 
 				<fieldset class="kps-field">
 					<legend data-i18n="survey.confidenceAfterLegend">After playing, how confident do you feel now?</legend>
-					<div class="kps-scale" role="radiogroup" aria-label="Confidence after playing, 1 to 5">
+					<div class="kps-scale">
 						<label class="kps-scale-option"><input type="radio" name="confidenceAfter" value="1" required /><span>1</span></label>
 						<label class="kps-scale-option"><input type="radio" name="confidenceAfter" value="2" /><span>2</span></label>
 						<label class="kps-scale-option"><input type="radio" name="confidenceAfter" value="3" /><span>3</span></label>
@@ -100,7 +100,7 @@
 
 				<fieldset class="kps-field">
 					<legend data-i18n="survey.feelsMoreAwareLegend">Do you feel more aware of common scam warning signs now?</legend>
-					<div class="kps-pill-group" role="radiogroup" aria-label="Feels more aware of scam warning signs">
+					<div class="kps-pill-group">
 						<label class="kps-pill-option"><input type="radio" name="feelsMoreAware" value="yes" required /><span data-i18n="survey.yes">Yes</span></label>
 						<label class="kps-pill-option"><input type="radio" name="feelsMoreAware" value="somewhat" /><span data-i18n="survey.somewhat">Somewhat</span></label>
 						<label class="kps-pill-option"><input type="radio" name="feelsMoreAware" value="no" /><span data-i18n="survey.notReally">Not really</span></label>
@@ -126,7 +126,7 @@
 
 				<fieldset class="kps-field">
 					<legend data-i18n="survey.wouldShareLegend">Would you share what you learned with family or friends?</legend>
-					<div class="kps-pill-group" role="radiogroup" aria-label="Would share what they learned">
+					<div class="kps-pill-group">
 						<label class="kps-pill-option"><input type="radio" name="wouldShare" value="yes" required /><span data-i18n="survey.yes">Yes</span></label>
 						<label class="kps-pill-option"><input type="radio" name="wouldShare" value="maybe" /><span data-i18n="survey.maybe">Maybe</span></label>
 						<label class="kps-pill-option"><input type="radio" name="wouldShare" value="no" /><span data-i18n="survey.no">No</span></label>
@@ -142,6 +142,11 @@
 				<p class="kps-info" data-survey-status hidden></p>
 			</form>
 		</template>
+
+		<!-- Always-present live region: screen readers only announce changes to a
+		     region that already existed, so status text is copied here by
+		     announce() in game/index.js rather than relying on un-hiding. -->
+		<p id="sr-status" class="kps-sr-only" role="status"></p>
 
 		<script type="module" src="/js/pages/game/index.js"></script>
 	</body>

@@ -117,12 +117,27 @@ code {
   font-size: 0.9em;
 }
 
-/* One consistent focus treatment for every interactive element. The white
-   inner ring keeps it legible on both white cards and purple buttons. */
+/* One consistent focus treatment for every interactive element. This is an
+   outline, not a box-shadow: components set their own box-shadow (the
+   sticker offset), which would silently replace a shadow-based ring, and
+   outlines also survive Windows High Contrast mode. */
 :where(a, button, input, select, textarea, [tabindex]):focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px var(--kps-white), 0 0 0 6px var(--kps-purple-dark);
-  border-radius: var(--kps-radius-sm);
+  outline: 3px solid var(--kps-purple-dark);
+  outline-offset: 3px;
+}
+/* Headings get tabindex="-1" only so JS can move focus to them after a
+   screen change; they aren't controls, so they don't need a ring. */
+[tabindex="-1"]:focus { outline: none; }
+
+/* Visually hidden, still read by screen readers (live regions). */
+.kps-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 /* ── 3. Layout ───────────────────────────────────────────────────────────── */
@@ -156,7 +171,8 @@ code {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--sp-4);
+  flex-wrap: wrap;   /* at 320px the actions drop below the logo instead of overflowing */
+  gap: var(--sp-3) var(--sp-4);
   padding: var(--sp-3) var(--sp-6);
   background: var(--kps-white);
   border-bottom: var(--kps-border);
@@ -302,7 +318,15 @@ fieldset.kps-field legend {
   box-shadow: var(--kps-shadow-sm);
   transition: box-shadow var(--dur) var(--ease), border-color var(--dur) var(--ease);
 }
-.kps-input::placeholder { color: #7a8090; font-weight: 500; }
+.kps-input::placeholder { color: var(--kps-muted); font-weight: 400; }
+
+/* Visible field label for single-column forms (login pages). */
+.kps-label {
+  align-self: flex-start;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  margin-bottom: calc(var(--sp-2) * -1);
+}
 .kps-input:hover:not(:disabled) { border-color: var(--kps-purple-dark); }
 
 /* Native select needs its own chevron once appearance is normalised. */
