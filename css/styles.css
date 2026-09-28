@@ -21,7 +21,7 @@
 /* ── 1. Tokens ───────────────────────────────────────────────────────────── */
 :root {
   /* Brand — unchanged core palette */
-  --kps-bg: #e6c9ff;              /* light purple page field */
+  --kps-bg: #c2fbff;              /* light cyan page field */
   --kps-purple: #c026d3;          /* primary action */
   --kps-purple-dark: #a21caf;     /* hover / pressed */
   --kps-white: #ffffff;
@@ -153,18 +153,6 @@ code {
   align-items: stretch;
   display: block;
   padding: 0;
-  /* Mascot sticker tile over a soft brand-derived gradient. The gradient is
-     fixed (doesn't scroll or repeat) so the backdrop reads as one continuous
-     surface; the tile repeats above it. clamp() scales tile density with the
-     viewport so it looks deliberate on phone and laptop alike. */
-  background-image:
-    url('/assets/kps/quiz-bg-tile.png'),
-    linear-gradient(135deg, #ffe3f6 0%, var(--kps-bg) 55%, #cdeaff 100%);
-  background-repeat: repeat, no-repeat;
-  background-size:
-    clamp(200px, 26vw, 340px) clamp(179px, 23vw, 304px),
-    cover;
-  background-attachment: scroll, fixed;
 }
 
 .game-header {

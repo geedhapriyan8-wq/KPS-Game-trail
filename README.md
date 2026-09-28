@@ -204,18 +204,17 @@ without having to reverse-engineer it.
 
 | File | What it's for |
 |---|---|
-| `js/pages/game/questions.js` | The question bank (50 questions, English — the canonical source of truth), the `CATEGORIES` map, and `getRandomQuiz()` which builds one randomized 6-question playthrough. **This is the file you edit to add/change questions or categories.** |
+| `js/pages/game/questions.js` | The question bank (40 questions, English — the canonical source of truth), the `CATEGORIES` map, and `getRandomQuiz()` which builds one randomized 6-question playthrough. **This is the file you edit to add/change questions or categories.** |
 | `js/pages/game/i18n.js` | UI string translations (4 languages) and question-content translations (Chinese/Malay/Tamil), keyed by question id. **Edit this to add a language or translate a question.** |
 | `js/pages/game/index.js` | Quiz engine: renders one question at a time, scores answers, fires analytics, saves the completion doc, then hands off to the existing survey. Also drives the language switcher. You shouldn't need to touch this to add content — only if you're changing *how* the quiz behaves. |
 | `game/index.html` | The quiz/result card markup (`#quiz-screen`, `#quiz-result`), the language `<select>`, and the survey `<template>`. Translatable static text is marked with `data-i18n="key"`. |
 | `css/styles.css` | `.kps-quiz-option`, `.kps-quiz-card`, `.kps-quiz-meta` / `.kps-quiz-prompt` / `.kps-quiz-counter` / `.kps-progress-track` / `.kps-progress-fill`, `.kps-lang-select`, and the `.screen-game` background rules. |
-| `assets/kps/quiz-bg-tile.png` | The repeating mascot-sticker background tile behind the game screen. |
-| `assets/kps/categories/*.png` | Full-opacity category mascot art (love, impersonation, investment, ecommerce), cropped from the original card illustrations. Used both to build the background tile and as the small icon shown next to the category name on the results breakdown. |
+| `assets/kps/categories/*.png` | Full-opacity category mascot art (love, impersonation, investment, ecommerce), cropped from the original card illustrations. Used as the small icon shown next to the category name on the results breakdown. |
 
 ### Question bank & categories
 
-The bank has **50 questions — 10 per category** (impersonation, blessing,
-love, investment, ecommerce). Each one in `QUESTIONS` (in `questions.js`)
+The bank has **40 questions — 10 per category** (impersonation, love,
+investment, ecommerce). Each one in `QUESTIONS` (in `questions.js`)
 looks like:
 
 ```javascript
@@ -253,13 +252,6 @@ export const CATEGORIES = {
     color: '#dbeafe',       // pastel badge background
     colorDark: '#1d4ed8',   // matching badge text color
   },
-  blessing: {
-    label: 'Blessing Scam',
-    emoji: '🙏',
-    icon: null,             // no artwork yet — badge falls back to the emoji
-    color: '#ede9fe',
-    colorDark: '#6d28d9',
-  },
   ...
 };
 ```
@@ -269,7 +261,7 @@ export const CATEGORIES = {
 it, drop the PNG in `assets/kps/categories/` and point `icon` at it —
 otherwise leave `icon: null` and the badge shows the emoji instead. Then
 add questions with that `category` key to `QUESTIONS`, each with a unique
-`id` following the `xxx-NN` convention (e.g. `bls-11` for an 11th blessing
+`id` following the `xxx-NN` convention (e.g. `luv-11` for an 11th love-scam
 question). No other code changes needed for English. **If you want the new
 questions available in the other three languages too**, add matching
 entries to `zh` / `ms` / `ta` in `i18n.js` — see
@@ -290,9 +282,9 @@ playthrough:
    independently (Fisher–Yates).
 2. Walks the categories in shuffled rounds, taking one not-yet-used
    question from each per round, until `total` questions are picked. With
-   5 categories and `total = 6`, every playthrough covers all 5 categories
-   once, plus one extra question from a randomly-chosen 6th slot — so which
-   category gets the "bonus" question differs every time.
+   4 categories and `total = 6`, every playthrough covers all 4 categories
+   once, plus two extra questions from randomly-chosen categories — so which
+   categories get the "bonus" questions differs every time.
 3. Shuffles the final list so categories don't always appear in the same
    sequence.
 
@@ -426,7 +418,6 @@ events:
   durationMs: 143201,
   categoryStats: {
     impersonation: { correct: 2, total: 2 },
-    blessing:      { correct: 1, total: 2 },
     love:          { correct: 2, total: 2 },
     investment:    { correct: 1, total: 2 },
     ecommerce:     { correct: 1, total: 2 },
@@ -438,34 +429,11 @@ This is exactly the shape you'd want for an admin dashboard chart of
 "average score by scam category" — query `completions` and aggregate
 `categoryStats` client-side, no schema change needed.
 
-### Background art (the mascot tile)
+### Background
 
-`.screen-game` layers two backgrounds:
-
-1. `assets/kps/quiz-bg-tile.png` — a repeating tile of the category mascots
-   at partial opacity plus a few sparkle accents, arranged off-grid so it
-   reads as scattered stickers rather than a rigid pattern.
-2. A fixed (non-scrolling, non-repeating) diagonal brand-color gradient
-   behind it, so the backdrop has color and depth even in the gaps between
-   mascots.
-
-Both are declared together in the `background-image` / `background-size`
-/ `background-repeat` / `background-attachment` shorthand properties on
-`.screen-game` in `css/styles.css` — each property takes two comma-separated
-values, one per layer, in the same order.
-
-**To regenerate the tile** (e.g. with new or updated mascot art): the tile
-was built with a short Python/Pillow script that crops each card's
-illustration, scales/rotates copies of it, composites them onto a
-transparent canvas at partial opacity, and draws a few star accents on
-top. If you're changing the artwork, the fastest path is redoing that
-composite (any image editor or a similar script works) and overwriting
-`assets/kps/quiz-bg-tile.png` — the CSS doesn't need to change unless you
-change the tile's aspect ratio.
-
-The tile's `background-size` uses `clamp()` so the pattern scales down on
-phones and up on laptops instead of staying a fixed pixel size — see
-**Responsive design** below.
+Every page uses a plain light-cyan background: the `--kps-bg` token
+(`#c2fbff`) in `css/styles.css`, applied on `body`. To change it, edit that
+one token and the matching `<meta name="theme-color">` in each HTML page.
 
 ### Responsive design (phone / tablet / laptop)
 
@@ -479,10 +447,6 @@ phones and up on laptops instead of staying a fixed pixel size — see
   `clamp(min, preferred, max)` font sizes instead of fixed `rem` values,
   so text scales smoothly across screen sizes instead of jumping at
   breakpoints.
-- The background tile's `background-size` also uses `clamp()` (in `vw`
-  units) so the mascot pattern's density looks right on both a phone and
-  a laptop screen instead of being a fixed pixel size that looks
-  oversized on small screens or sparse on large ones.
 - `.game-area` has `align-items: center`, so the quiz card stays centered
   at every viewport width rather than only looking centered by
   coincidence at one width.
@@ -537,13 +501,13 @@ Two collections capture everything the quiz produces. Both are written by
   durationMs: 98120,
   categoryStats: {
     impersonation: { correct: 1, total: 1 },
-    blessing:      { correct: 1, total: 2 },
+    love:          { correct: 1, total: 2 },
     // ... one entry per category the player saw
   },
   answers: [
     {
-      questionId: 'bls-02',       // stable id from questions.js
-      category: 'blessing',
+      questionId: 'luv-02',       // stable id from questions.js
+      category: 'love',
       position: 1,                // where it fell in this playthrough
       selectedIndex: 0,           // what they picked
       correctIndex: 1,            // what was right
@@ -666,7 +630,7 @@ keeps new work looking like it belongs.
 ### Brand identity (don't dilute this)
 
 The KPS look is **bold rounded type, thick black outlines, and offset "sticker"
-shadows on a purple field**. That is deliberately distinctive and should be
+shadows on a light-cyan field**. That is deliberately distinctive and should be
 preserved. The refinements below systematise it; they don't replace it.
 
 ### Nunito must be loaded on every page
@@ -980,7 +944,6 @@ kps-project-template/
 ├── assets/kps/             ← logo + favicon
 │   ├── kps_logo.svg        ← vector logo (use this on the web; fills with currentColor)
 │   ├── kps_logo.png        ← original raster logo, kept for non-web use
-│   ├── quiz-bg-tile.png    ← repeating mascot background tile for the game screen
 │   └── categories/         ← full-opacity category mascot art (love, impersonation, investment, ecommerce)
 ├── tests/
 │   ├── rules/              ← Firestore rules tests against real payloads (see its README)
