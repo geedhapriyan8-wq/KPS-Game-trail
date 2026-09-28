@@ -69,7 +69,6 @@ export const UI_STRINGS = {
     languageLabel: 'Language',
     categories: {
       impersonation: 'Impersonation',
-      blessing: 'Blessing Scam',
       love: 'Love Scam',
       investment: 'Investment Scam',
       ecommerce: 'E-commerce Scam',
@@ -124,7 +123,6 @@ export const UI_STRINGS = {
     languageLabel: '语言',
     categories: {
       impersonation: '冒充诈骗',
-      blessing: '消灾解难骗局',
       love: '爱情骗局',
       investment: '投资骗局',
       ecommerce: '网购骗局',
@@ -179,7 +177,6 @@ export const UI_STRINGS = {
     languageLabel: 'Bahasa',
     categories: {
       impersonation: 'Penyamaran',
-      blessing: 'Penipuan Berkat',
       love: 'Penipuan Cinta',
       investment: 'Penipuan Pelaburan',
       ecommerce: 'Penipuan E-dagang',
@@ -234,7 +231,6 @@ export const UI_STRINGS = {
     languageLabel: 'மொழி',
     categories: {
       impersonation: 'போலியாக நடிக்கும் மோசடி',
-      blessing: 'ஆசி / பரிகார மோசடி',
       love: 'காதல் மோசடி',
       investment: 'முதலீட்டு மோசடி',
       ecommerce: 'இணைய வணிக மோசடி',
@@ -348,56 +344,6 @@ export const zh = {
     scenario: '一名自称来自知名科技公司的来电者说您的电脑不断发出病毒警报，提出可以远程为您修复，前提是您安装他发来的应用程序，之后再向您收取“维修费”。',
     options: ['挂断电话——科技公司不会主动致电通知病毒警报，也绝不安装陌生来电者提供的远程访问软件', '让他远程访问电脑，但先不透露付款资料', '安装应用程序并付费，尽快修复病毒问题', '先要求对方提供员工编号证明身份，再决定'],
     explanation: '正规科技公司不会主动致电通知病毒警报。为陌生人安装远程访问软件，可能让对方看到您电脑上的所有信息，包括银行资料。',
-  },
-  'bls-01': {
-    scenario: '一名陌生老人接近您，说您家中有诅咒缠身，提出可以为您的黄金首饰和现金“作法净化”，但要求您先把这些物品交给她。',
-    options: ['答应，但要求她当着您的面进行仪式', '把首饰和现金交给她，以便消除诅咒', '婉拒并离开——没有人能通过拿走您的贵重物品来消除诅咒', '只给首饰，不给现金'],
-    explanation: '这是典型的消灾解难骗局。贵重物品一旦离手，就很难追回了。真正的宗教或灵性帮助绝不会要求您交出现金或首饰。',
-  },
-  'bls-02': {
-    scenario: '一名“庙宇灵媒”来电，说您的健康问题是恶灵作祟所致。她提出，只要您先把存款转给她“作法”，就能通过特殊仪式让您的钱翻倍。',
-    options: ['请家人代为转账', '挂断电话——没有任何仪式能让钱翻倍，这是骗局', '先转一小笔金额，测试是否真的能翻倍', '亲自见面并用现金支付，感觉会比较安全'],
-    explanation: '没有任何仪式、祈福或灵媒能让您的钱“翻倍”。任何要求汇款以求增值或消灾的说法都是骗局——请挂断电话，不要再理会。',
-  },
-  'bls-03': {
-    scenario: '一名打扮成僧人的人上门为庙宇募捐，在称赞您慷慨大方、“福气好”之后，坚持要您捐出比平常多得多的金额，以“配得上您的好福气”。',
-    options: ['因为他说您福气好，就捐出较大金额', '先给这笔钱，但如果他无法证明自己是真正的僧人就要回来', '请他之后带收据簿再来，届时再决定', '婉拒这种额外的压力，只捐出您觉得自在的金额，或改为捐给正规注册慈善机构'],
-    explanation: '真正的宗教团体不会用奉承的方式向人施压，要求更多捐款。如果您想捐款，请捐给您自行查证过的正规注册慈善机构。',
-  },
-  'bls-04': {
-    scenario: '市场里一名陌生女子提出免费为您看手相，看着看着突然一脸担忧，说您家很快会遇上大灾祸——除非您现在向她购买一个特别的护身符。',
-    options: ['买一个便宜一点的护身符，以防万一', '立即购买护身符以保护家人', '先讨价还价再购买', '转身离开——这是常见的施压手法，真正的警示不会靠卖护身符来解决'],
-    explanation: '这是典型的施压手法：先制造恐惧，再推销“解决方案”。真正的预言不会恰好靠当场购物就能化解。',
-  },
-  'bls-05': {
-    scenario: '在小贩中心，一名女子说她感应到您的儿子身处严重危险，提出为他祈福，但表示每次祈祷都必须支付越来越多的钱，祈福才会“有效”。',
-    options: ['意识到这是利用您对孩子的担忧而设的骗局，停止付款并离开', '要求她当场打电话给儿子证明', '为了保护儿子，继续支付越来越多的钱', '再多付一次，如果情况没有改善就停止'],
-    explanation: '骗子经常利用父母对子女的爱与担忧下手。真正的祈祷或祈福绝不会索价不断攀升——请立即离开。',
-  },
-  'bls-06': {
-    scenario: '有人自称代表某间庙宇致电，说您的祖先“不高兴”，为家中带来厄运，必须尽快进行一场特定金额的祈福法事才能化解。',
-    options: ['挂断电话——正规庙宇不会无故来电，要求付钱来“安抚”祖先', '先讨价还价，压低价格再付款', '尽快转账，以免祖先带来更多厄运', '请家人直接致电对方提供的号码向庙宇求证'],
-    explanation: '真正的庙宇不会主动致电索取钱财来“处理”祖先相关的事。若有疑虑，请自行查找您认识且信任的庙宇的联系方式求证。',
-  },
-  'bls-07': {
-    scenario: '一小群人在街上表演祈福仪式，递给您一个红包，说您必须“回礼”捐款。您给了一小笔钱，但他们坚持要更大笔的转账，祈福才算“圆满”。',
-    options: ['再多给一点，但坚决拒绝更多要求', '转账较大金额，以免祈福不圆满', '要求他们写明这笔钱的用途，再决定是否多付', '转身离开——真正的祈福不是一场不断加码的金钱交易'],
-    explanation: '先收取小额款项后再不断加码索取，是常见的街头骗局手法。根本没有所谓“不圆满”而需要额外付款的祈福——请转身离开。',
-  },
-  'bls-08': {
-    scenario: '一名自称风水师的人提出免费为您看家宅风水，之后说您家中有邪灵，只有购买他碰巧在售卖的特定昂贵物品或水晶才能驱除。',
-    options: ['购买他推荐的物品以驱除邪灵', '婉拒——真正的风水咨询不应该要求向顾问本人购买特定的昂贵物品', '要求他免费帮忙驱邪，因为您是年长者', '购买较便宜的替代品'],
-    explanation: '当诊断问题的人正好也是昂贵解决方案的卖家时，要特别小心。这种利益冲突是常见的推销手法，用来促使人购买不必要的物品。',
-  },
-  'bls-09': {
-    scenario: '一名来电者说您的彩票号码“被诅咒”带来厄运，提出通过一场仪式性的“交换”来净化——您把现金交出去“作法”，之后会双倍奉还，但归还的钱竟然是假钞。',
-    options: ['可以尝试，但只用不要的旧钞票', '拒绝——没有任何仪式能祈福或让钱翻倍，交出真钞去“交换”很可能血本无归', '要求先把“作法”后的钱拿去银行检查', '先用一小笔金额试一试是否真的有效'],
-    explanation: '这种“交换”手法是设计来在“仪式”过程中把您的真钞换成假钞。任何祈福都不会改变金钱的价值——切勿为此交出现金。',
-  },
-  'bls-10': {
-    scenario: '一名打扮成僧人的男子在您家门口，提出送您一个“护身”手链，并坚持要您给予高额捐款作为回报，当您表示没有兴趣时，他变得咄咄逼人，让人不安。',
-    options: ['收下手链，答应下次再付款', '坚决拒绝并关门；如果他不肯离开，联系邻居或保安协助', '妥协付款，让他离开', '提出少得多的金额，尽快结束对话'],
-    explanation: '真正的宗教捐款绝不会是被强迫的。当您拒绝后对方变得咄咄逼人，本身就是一个警讯——请坚定拒绝，必要时寻求他人协助。',
   },
   'luv-01': {
     scenario: '您与一名在网上认识的男子聊了两个月，他自称是在海外工作的工程师。他从未与您视频通话，如今却说急需一笔钱支付“海关费”，才能飞来新加坡见您。',
@@ -602,56 +548,6 @@ export const ms = {
     options: ['Letakkan telefon — syarikat teknologi tidak menelefon dahulu tentang amaran virus, dan jangan sesekali pasang aplikasi akses jauh daripada pemanggil tidak dikenali', 'Biarkan dia mengakses komputer anda tetapi jangan berikan butiran pembayaran lagi', 'Pasang aplikasi dan bayar pembaikan untuk membetulkan virus dengan cepat', 'Minta dia buktikan dia daripada syarikat itu dengan memberikan ID pekerja dahulu'],
     explanation: 'Syarikat teknologi sebenar tidak menelefon secara tiba-tiba tentang amaran virus. Memasang perisian akses jauh untuk orang asing boleh membenarkan mereka melihat segala-galanya dalam komputer anda, termasuk butiran perbankan.',
   },
-  'bls-01': {
-    scenario: 'Seorang wanita tua yang tidak dikenali menghampiri anda dan berkata keluarga anda dilanda nasib malang akibat sumpahan, dan menawarkan untuk “membersihkan” barang kemas emas dan wang tunai anda dengan berdoa ke atasnya — tetapi anda mesti menyerahkan barang tersebut dahulu.',
-    options: ['Setuju, tetapi minta mereka lakukan upacara di hadapan anda dahulu', 'Serahkan barang kemas dan wang tunai supaya sumpahan boleh dihapuskan', 'Tolak dengan sopan dan berjalan pergi — tiada siapa boleh menghapuskan sumpahan dengan mengambil barang berharga anda', 'Berikan barang kemas sahaja, simpan wang tunai'],
-    explanation: 'Ini penipuan berkat klasik. Sebaik sahaja barang berharga anda meninggalkan tangan anda, ia hilang. Bantuan agama atau kerohanian sebenar tidak pernah memerlukan anda menyerahkan wang tunai atau barang kemas.',
-  },
-  'bls-02': {
-    scenario: 'Seorang “bomoh kuil” menelefon dan berkata masalah kesihatan anda disebabkan oleh roh jahat. Dia menawarkan untuk menggandakan wang anda melalui upacara khas jika anda memindahkan dahulu simpanan anda kepadanya untuk “diberkati”.',
-    options: ['Minta ahli keluarga memindahkan wang bagi pihak anda sebaliknya', 'Letakkan telefon — tiada upacara boleh menggandakan wang anda, ini penipuan', 'Pindahkan jumlah kecil dahulu untuk menguji sama ada ia benar-benar berganda', 'Jumpa dia secara peribadi dan bayar tunai supaya terasa lebih selamat'],
-    explanation: 'Tiada upacara, berkat, atau bomoh boleh “menggandakan” wang anda. Sebarang permintaan menghantar wang untuk digandakan atau diberkati adalah penipuan — letakkan telefon dan jangan layan lagi.',
-  },
-  'bls-03': {
-    scenario: 'Seorang yang berpakaian seperti sami datang ke rumah anda mengutip derma untuk kuil, dan selepas memuji kemurahan hati serta “nasib baik” anda, mendesak anda memberi jumlah yang jauh lebih besar daripada biasa untuk “selari dengan nasib baik anda”.',
-    options: ['Berikan jumlah yang lebih besar kerana dia berkata anda bernasib baik', 'Berikan jumlah itu tetapi minta semula jika dia tidak dapat buktikan dia sami sebenar', 'Minta dia datang semula kemudian dengan buku resit sebelum membuat keputusan', 'Tolak dengan sopan tekanan tambahan itu dan hanya beri jumlah yang selesa untuk anda, atau tiada langsung, kepada badan amal berdaftar sebaliknya'],
-    explanation: 'Organisasi agama sebenar tidak menekan orang untuk memberi derma lebih besar menggunakan pujian. Jika anda ingin menderma, buatlah kepada badan amal berdaftar yang telah anda sahkan sendiri.',
-  },
-  'bls-04': {
-    scenario: 'Seorang asing di pasar menawarkan untuk membaca tapak tangan anda secara percuma, kemudian tiba-tiba kelihatan risau dan berkata satu bencana besar akan menimpa keluarga anda tidak lama lagi — melainkan anda membeli azimat pelindung khas daripadanya sekarang.',
-    options: ['Beli azimat yang lebih murah untuk berjaga-jaga', 'Beli azimat itu segera untuk melindungi keluarga anda', 'Minta dia turunkan harga sebelum membeli', 'Berjalan pergi — ini taktik tekanan biasa, dan amaran sebenar tidak dijual sebagai azimat'],
-    explanation: 'Ini taktik tekanan klasik: cipta ketakutan, kemudian jual “penyelesaian”. Tiada bacaan sebenar meramalkan bencana yang kebetulan boleh diselesaikan dengan membeli sesuatu di situ juga.',
-  },
-  'bls-05': {
-    scenario: 'Di pusat penjaja, seorang wanita memberitahu anda dia dapat merasakan anak lelaki anda dalam bahaya serius, dan menawarkan untuk berdoa demi keselamatannya — tetapi berkata doa itu hanya berkesan jika anda membayarnya jumlah yang semakin meningkat setiap kali bertemu.',
-    options: ['Sedar ini penipuan yang memanfaatkan kerisauan anda terhadap anak, dan berhenti membayar serta berjalan pergi', 'Minta dia membuktikannya dengan menelefon anak anda di situ juga', 'Terus membayar lebih setiap kali untuk melindungi anak anda', 'Bayar sekali lagi, kemudian berhenti jika tiada perubahan'],
-    explanation: 'Penipu sering menyasarkan kasih sayang dan kerisauan ibu bapa terhadap anak-anak mereka. Doa atau berkat sebenar tidak pernah dijual dengan harga yang semakin meningkat — berjalan pergi.',
-  },
-  'bls-06': {
-    scenario: 'Anda menerima panggilan telefon daripada seseorang yang mendakwa mewakili sebuah kuil, mengatakan nenek moyang anda “tidak gembira” dan menyebabkan nasib malang dalam keluarga anda, dan satu doa khas berkos sejumlah wang tertentu perlu dilakukan segera untuk membetulkannya.',
-    options: ['Letakkan telefon — tiada kuil sah menelefon secara tiba-tiba menuntut wang untuk “membetulkan” ketidakgembiraan nenek moyang', 'Berunding untuk menurunkan harga sebelum membayar', 'Pindahkan wang segera supaya nenek moyang anda tidak membawa lebih nasib malang', 'Minta ahli keluarga sahkan terus dengan kuil dengan menelefon nombor yang diberikan'],
-    explanation: 'Kuil sebenar tidak menelefon secara tiba-tiba menuntut wang untuk doa berkaitan nenek moyang. Jika risau, kunjungi atau telefon kuil yang anda sudah kenal dan percayai, menggunakan nombor yang anda cari sendiri.',
-  },
-  'bls-07': {
-    scenario: 'Sekumpulan kecil orang melakukan upacara berkat di jalan dan menghulurkan angpau kepada anda, mengatakan anda mesti “membalas berkat” dengan derma. Anda memberi jumlah kecil, tetapi mereka mendesak pemindahan yang jauh lebih besar diperlukan supaya berkat itu “lengkap”.',
-    options: ['Berikan sedikit lagi, tetapi tegas menolak apa-apa selebihnya', 'Pindahkan jumlah yang lebih besar supaya berkat itu tidak tergantung', 'Minta mereka menulis bagaimana wang itu akan digunakan sebelum membayar lagi', 'Berjalan pergi — berkat sebenar bukan urus niaga kewangan dengan tuntutan yang semakin meningkat'],
-    explanation: 'Tuntutan yang semakin meningkat selepas bayaran kecil awal adalah corak penipuan jalanan yang biasa. Tiada apa yang dipanggil berkat “tidak lengkap” yang memerlukan lebih banyak wang — berjalan pergi.',
-  },
-  'bls-08': {
-    scenario: 'Seorang yang mendakwa diri sebagai ahli feng shui menawarkan pemeriksaan rumah percuma, kemudian memberitahu anda ada roh jahat di rumah anda yang hanya boleh dihapuskan dengan membeli barang atau kristal mahal tertentu yang kebetulan dijualnya sendiri.',
-    options: ['Beli barang yang disyorkannya untuk menghapuskan roh jahat', 'Tolak — rundingan feng shui sebenar tidak sepatutnya memerlukan pembelian barang mahal tertentu daripada perunding itu sendiri', 'Minta dia menghapuskan roh secara percuma kerana anda warga emas', 'Beli versi yang lebih murah bagi barang itu'],
-    explanation: 'Berhati-hati apabila orang yang mendiagnosis masalah juga orang yang menjual penyelesaian mahalnya. Konflik kepentingan ini adalah cara biasa untuk menekan orang membeli barang yang tidak diperlukan.',
-  },
-  'bls-09': {
-    scenario: 'Seorang pemanggil berkata nombor loteri anda “disumpah” dengan nasib malang dan menawarkan untuk membersihkannya melalui pertukaran upacara — anda menyerahkan wang tunai untuk “diberkati” dan mendapatnya kembali berganda, tetapi wang yang dikembalikan didapati palsu.',
-    options: ['Lakukan, tetapi hanya dengan wang kertas lama yang tidak diperlukan', 'Tolak — tiada upacara boleh memberkati atau menggandakan wang, dan menyerahkan wang tunai sebenar untuk “pertukaran” berisiko kehilangannya sepenuhnya', 'Minta wang yang diberkati disemak oleh bank dahulu', 'Cuba sekali dengan jumlah kecil untuk menguji sama ada ia benar'],
-    explanation: 'Helah pertukaran ini direka untuk menukar wang sebenar anda dengan wang palsu semasa “upacara”. Tiada berkat mengubah nilai wang — jangan sesekali serahkan wang tunai untuk pertukaran sebegini.',
-  },
-  'bls-10': {
-    scenario: 'Seorang lelaki berpakaian seperti sami di pintu rumah anda menawarkan gelang azimat untuk “perlindungan” dan mendesak derma besar sebagai balasan, menjadi mendesak dan tidak selesa apabila anda cuba mengatakan anda tidak berminat.',
-    options: ['Ambil gelang itu dan berjanji membayarnya lain kali', 'Tegas berkata tidak dan tutup pintu; hubungi jiran atau pengawal keselamatan jika dia tidak mahu pergi', 'Mengalah dan membayar supaya dia pergi', 'Tawarkan jumlah yang jauh lebih kecil untuk menamatkan perbualan'],
-    explanation: 'Derma agama sebenar tidak pernah dipaksa. Sikap agresif atau mendesak apabila anda menolak adalah amaran itu sendiri — tegas dan dapatkan bantuan jika seseorang enggan pergi.',
-  },
   'luv-01': {
     scenario: 'Anda telah berbual selama dua bulan dengan seseorang yang anda kenali dalam talian yang mendakwa dia jurutera yang bekerja di luar negara. Dia tidak pernah membuat panggilan video dengan anda, dan kini berkata dia memerlukan wang segera untuk “yuran kastam” bagi terbang ke Singapura menemui anda.',
     options: ['Hantar separuh jumlah untuk menunjukkan anda mempercayainya', 'Desak panggilan video secara langsung dahulu, dan enggan menghantar wang kepada seseorang yang anda tidak pernah benar-benar lihat atau temui', 'Hantar wang — dia sangat penyayang dalam perbualan anda', 'Minta dia menghantar gambar memegang surat khabar hari ini sebagai bukti'],
@@ -854,56 +750,6 @@ export const ta = {
     scenario: 'ஒரு பிரபலமான தொழில்நுட்ப நிறுவனத்திலிருந்து அழைப்பதாகக் கூறும் ஒருவர், உங்கள் கணினியிலிருந்து வைரஸ் எச்சரிக்கைகள் வருகின்றன என்று கூறி, தான் அனுப்பும் ஒரு ஆப்பை நிறுவினால் தொலைவிலிருந்தே சரிசெய்வதாகக் கூறி, பின் “பழுதுபார்ப்பு” கட்டணத்தைக் கேட்கிறார்.',
     options: ['தொலைபேசியை துண்டிப்பது — தொழில்நுட்ப நிறுவனங்கள் வைரஸ் எச்சரிக்கை பற்றி முதலில் அழைக்காது, தெரியாத அழைப்பாளர்களிடமிருந்து தொலைவு அணுகல் ஆப்களை ஒருபோதும் நிறுவக்கூடாது', 'அவரை கணினியை அணுக அனுமதித்து, ஆனால் இன்னும் கட்டண விவரங்களை கொடுக்காதிருப்பது', 'ஆப்பை நிறுவி, வைரஸை விரைவாக சரிசெய்ய கட்டணம் செலுத்துவது', 'அவர் நிறுவனத்திலிருந்து வந்தவர் என்பதை நிரூபிக்க முதலில் ஊழியர் ஐடி கேட்பது'],
     explanation: 'உண்மையான தொழில்நுட்ப நிறுவனங்கள் வைரஸ் எச்சரிக்கைகள் பற்றி திடீரென அழைக்காது. அந்நியருக்கு தொலைவு அணுகல் மென்பொருளை நிறுவினால், உங்கள் கணினியில் உள்ள வங்கி விவரங்கள் உட்பட அனைத்தையும் அவர்கள் பார்க்க முடியும்.',
-  },
-  'bls-01': {
-    scenario: 'அறிமுகமில்லாத ஒரு முதியவர் உங்களை அணுகி, சாபத்தால் உங்கள் குடும்பத்திற்கு துர்பாக்கியம் ஏற்பட்டுள்ளது எனக் கூறி, உங்கள் தங்க நகைகள் மற்றும் பணத்தை பிரார்த்தனை செய்து “சுத்திகரிக்க” முன்வருகிறார் — ஆனால் முதலில் அந்த பொருட்களை அவரிடம் ஒப்படைக்க வேண்டும் என்கிறார்.',
-    options: ['சம்மதித்து, ஆனால் அவர்கள் உங்கள் முன்னிலையில் சடங்கை செய்யச் சொல்வது', 'சாபத்தை நீக்க நகைகள் மற்றும் பணத்தை ஒப்படைப்பது', 'மரியாதையுடன் மறுத்து அப்புறப்படுவது — உங்கள் மதிப்புமிக்க பொருட்களை எடுப்பதன் மூலம் யாரும் சாபத்தை நீக்க முடியாது', 'நகைகளை மட்டும் கொடுத்து, பணத்தை வைத்திருப்பது'],
-    explanation: 'இது ஒரு பொதுவான ஆசி/பரிகார மோசடி. உங்கள் மதிப்புமிக்க பொருட்கள் உங்கள் கையை விட்டு விலகியதும், அவை போய்விடும். உண்மையான மத அல்லது ஆன்மீக உதவிக்கு ஒருபோதும் பணத்தையோ நகைகளையோ ஒப்படைக்க வேண்டியதில்லை.',
-  },
-  'bls-02': {
-    scenario: 'ஒரு “கோவில் ஊடகர்” அழைத்து, உங்கள் உடல்நல பிரச்சினைகளுக்கு தீய ஆவிகள் காரணம் எனக் கூறுகிறார். “ஆசி” பெற முதலில் உங்கள் சேமிப்பை அவரிடம் மாற்றினால், ஒரு சிறப்பு சடங்கு மூலம் உங்கள் பணத்தை இரட்டிப்பாக்குவதாக கூறுகிறார்.',
-    options: ['பதிலாக ஒரு குடும்ப உறுப்பினரை பணத்தை மாற்றச் சொல்வது', 'தொலைபேசியை துண்டிப்பது — எந்த சடங்கும் உங்கள் பணத்தை இரட்டிப்பாக்க முடியாது, இது ஒரு மோசடி', 'உண்மையில் இரட்டிப்பாகுமா என சோதிக்க முதலில் ஒரு சிறிய தொகையை மாற்றுவது', 'அவரை நேரில் சந்தித்து, பாதுகாப்பாக உணர ரொக்கமாக செலுத்துவது'],
-    explanation: 'எந்த சடங்கு, ஆசி, அல்லது ஊடகரும் உங்கள் பணத்தை “இரட்டிப்பாக்க” முடியாது. பணத்தை பெருக்க அல்லது ஆசி பெற அனுப்பச் சொல்லும் எந்த கோரிக்கையும் ஒரு மோசடியே — தொலைபேசியை துண்டித்து, மேலும் ஈடுபடாதீர்கள்.',
-  },
-  'bls-03': {
-    scenario: 'துறவி போல் உடையணிந்த ஒருவர் உங்கள் வீட்டு வாசலுக்கு வந்து கோவிலுக்கு நன்கொடை வசூலிக்கிறார், உங்கள் தாராள மனப்பான்மையையும் “நல்ல அதிர்ஷ்டத்தையும்” புகழ்ந்த பிறகு, உங்கள் “ஆசீர்வதிக்கப்பட்ட விதிக்கு ஏற்ப” வழக்கத்தை விட மிகப் பெரிய தொகையை கொடுக்க வேண்டும் என வலியுறுத்துகிறார்.',
-    options: ['அவர் உங்களை அதிர்ஷ்டசாலி என்று சொல்வதால், அதிக தொகையை கொடுப்பது', 'தொகையை கொடுத்துவிட்டு, அவர் உண்மையான துறவி என நிரூபிக்கவில்லை எனில் திரும்பக் கேட்பது', 'பின்னர் ரசீது புத்தகத்துடன் திரும்ப வரச் சொல்லிவிட்டு முடிவெடுப்பது', 'கூடுதல் அழுத்தத்தை மரியாதையுடன் மறுத்து, உங்களுக்கு வசதியான தொகையை மட்டும், அல்லது பதிவுசெய்யப்பட்ட தொண்டு நிறுவனத்திற்கு நன்கொடை கொடுப்பது'],
-    explanation: 'உண்மையான மத நிறுவனங்கள் புகழ்ச்சி மூலம் அதிக நன்கொடைக்கு அழுத்தம் தராது. நீங்கள் நன்கொடை கொடுக்க விரும்பினால், நீங்களே சரிபார்த்த பதிவுசெய்யப்பட்ட தொண்டு நிறுவனத்திற்கு கொடுங்கள்.',
-  },
-  'bls-04': {
-    scenario: 'சந்தையில் ஒரு அந்நியர் இலவசமாக உங்கள் கை ரேகையைப் பார்ப்பதாகக் கூறி, திடீரென கவலையான முகத்துடன், உடனடியாக ஒரு சிறப்பு பாதுகாப்பு தாயத்தை வாங்கவில்லையெனில் விரைவில் உங்கள் குடும்பத்திற்கு பெரிய ஆபத்து ஏற்படும் என்கிறார்.',
-    options: ['உண்மையாக இருந்தால் என்ன செய்வது என எண்ணி, மலிவான தாயத்தை வாங்குவது', 'குடும்பத்தை பாதுகாக்க உடனடியாக தாயத்தை வாங்குவது', 'வாங்குவதற்கு முன் விலையை குறைக்கச் சொல்வது', 'அப்புறப்படுவது — இது ஒரு பொதுவான அழுத்த உத்தி, உண்மையான எச்சரிக்கை ஒரு தாயத்தை விற்பதன் மூலம் தீராது'],
-    explanation: 'இது ஒரு பொதுவான அழுத்த உத்தி: பயத்தை உருவாக்கி, பின் “தீர்வை” விற்பது. அப்போதே ஏதாவது வாங்குவதன் மூலம் வசதியாக தீரக்கூடிய பேரழிவை உண்மையான ஜோதிடம் ஒருபோதும் கணிக்காது.',
-  },
-  'bls-05': {
-    scenario: 'ஒரு உணவகத்தில், ஒரு பெண் உங்கள் மகன் பெரிய ஆபத்தில் இருப்பதாக உணர்வதாகக் கூறி, அவனுடைய பாதுகாப்புக்காக பிரார்த்தனை செய்வதாக முன்வருகிறார் — ஆனால் ஒவ்வொரு முறை சந்திக்கும்போதும் அதிகரிக்கும் தொகையை செலுத்தினால் மட்டுமே பிரார்த்தனை பலிக்கும் என்கிறார்.',
-    options: ['இது உங்கள் குழந்தையின் மீதான கவலையை பயன்படுத்தும் மோசடி என்று உணர்ந்து, செலுத்துவதை நிறுத்தி விலகிச் செல்வது', 'அவரிடம் அங்கேயே மகனை அழைக்கச் சொல்லி நிரூபிக்கச் சொல்வது', 'மகனை பாதுகாக்க ஒவ்வொரு முறையும் அதிகமாக செலுத்துவது', 'இன்னொரு முறை மட்டும் செலுத்தி, மாற்றமில்லையெனில் நிறுத்துவது'],
-    explanation: 'மோசடி செய்பவர்கள் பெரும்பாலும் பெற்றோரின் பிள்ளைகள் மீதான அன்பையும் கவலையையும் இலக்காகக் கொள்கிறார்கள். உண்மையான பிரார்த்தனை அல்லது ஆசி ஒருபோதும் தொடர்ந்து அதிகரிக்கும் விலையுடன் விற்கப்படாது — உடனே அப்புறப்படுங்கள்.',
-  },
-  'bls-06': {
-    scenario: 'ஒரு கோவிலை பிரதிநிதித்துவப்படுத்துவதாகக் கூறும் ஒருவரிடமிருந்து தொலைபேசி அழைப்பு வருகிறது, உங்கள் முன்னோர்கள் “மகிழ்ச்சியற்று” இருப்பதாகவும், அதனால் குடும்பத்தில் துர்பாக்கியம் ஏற்படுவதாகவும், அதை சரிசெய்ய ஒரு குறிப்பிட்ட தொகை செலவாகும் சிறப்பு பிரார்த்தனை உடனடியாக செய்யப்பட வேண்டும் எனவும் கூறுகிறார்.',
-    options: ['தொலைபேசியை துண்டிப்பது — உண்மையான கோவில் எதுவும் திடீரென அழைத்து முன்னோர் தொடர்பான பிரச்சினையை “சரிசெய்ய” பணம் கேட்காது', 'செலுத்தும் முன் விலையை குறைக்க பேரம் பேசுவது', 'முன்னோர்கள் மேலும் துர்பாக்கியம் தராமல் இருக்க விரைவாக பணத்தை மாற்றுவது', 'கொடுக்கப்பட்ட எண்ணை அழைத்து கோவிலிடமே நேரடியாக உறுதிப்படுத்தச் சொல்வது ஒரு குடும்ப உறுப்பினரிடம்'],
-    explanation: 'உண்மையான கோவில்கள் முன்னோர் தொடர்பான பிரார்த்தனைகளுக்கு பணம் கேட்டு திடீரென அழைக்காது. கவலையாக இருந்தால், நீங்கள் ஏற்கனவே அறிந்து நம்பும் கோவிலை, நீங்களே தேடிய எண் மூலம் தொடர்பு கொள்ளுங்கள்.',
-  },
-  'bls-07': {
-    scenario: 'ஒரு சிறு குழு தெருவில் ஆசி சடங்கு செய்து, உங்களிடம் ஒரு சிவப்பு பாக்கெட் கொடுத்து, “ஆசியை திருப்பிக் கொடுக்க” நன்கொடை கொடுக்க வேண்டும் என்கிறார்கள். நீங்கள் ஒரு சிறிய தொகையை கொடுக்கிறீர்கள், ஆனால் ஆசி “முழுமையாக” இருக்க இன்னும் அதிக தொகை தேவை எனக் கூறுகிறார்கள்.',
-    options: ['இன்னும் கொஞ்சம் கொடுத்து, அதற்கு மேல் உறுதியாக மறுப்பது', 'ஆசி முழுமையடையாமல் இருக்காதவாறு அதிக தொகையை மாற்றுவது', 'பணம் எப்படி பயன்படுத்தப்படும் என எழுதிக் கொடுக்கச் சொல்லிவிட்டு மேலும் செலுத்துவது', 'அப்புறப்படுவது — உண்மையான ஆசி என்பது அதிகரிக்கும் கோரிக்கைகளுடன் கூடிய நிதி பரிவர்த்தனை அல்ல'],
-    explanation: 'ஆரம்ப சிறிய கட்டணத்திற்குப் பிறகு அதிகரிக்கும் கோரிக்கைகள் ஒரு பொதுவான தெரு மோசடி முறை. மேலும் பணம் தேவைப்படும் “முழுமையடையாத” ஆசி என்று எதுவும் இல்லை — அப்புறப்படுங்கள்.',
-  },
-  'bls-08': {
-    scenario: 'தன்னை ஃபெங் ஷுயி வல்லுநர் என அறிவிக்கும் ஒருவர் இலவச வீட்டு ஆய்வு செய்வதாக முன்வந்து, பின் உங்கள் வீட்டில் தீய ஆவிகள் உள்ளன என்றும், அவர் விற்கும் குறிப்பிட்ட விலையுயர்ந்த பொருட்கள் அல்லது படிகங்களை வாங்கினால் மட்டுமே அவற்றை அகற்ற முடியும் என்றும் கூறுகிறார்.',
-    options: ['தீய ஆவிகளை அகற்ற அவர் பரிந்துரைக்கும் பொருட்களை வாங்குவது', 'மறுப்பது — உண்மையான ஃபெங் ஷுயி ஆலோசனைக்கு, ஆலோசகரிடமிருந்தே குறிப்பிட்ட விலையுயர்ந்த பொருட்களை வாங்க வேண்டியதில்லை', 'நீங்கள் மூத்த குடிமகன் என்பதால் இலவசமாக ஆவிகளை அகற்றச் சொல்வது', 'மலிவான பதிப்பை வாங்குவது'],
-    explanation: 'பிரச்சினையை கண்டறியும் நபரே விலையுயர்ந்த தீர்வையும் விற்கும்போது எச்சரிக்கையாக இருங்கள். இந்த நலன் முரண்பாடு, தேவையற்ற பொருட்களை வாங்க மக்களை வற்புறுத்தும் ஒரு பொதுவான வழி.',
-  },
-  'bls-09': {
-    scenario: 'ஒரு அழைப்பாளர் உங்கள் லாட்டரி எண்கள் துர்பாக்கியத்தால் “சபிக்கப்பட்டுள்ளன” என்று கூறி, ஒரு சடங்கு பரிமாற்றம் மூலம் அதை சுத்திகரிக்க முன்வருகிறார் — நீங்கள் “ஆசி” பெற உங்கள் பணத்தை கொடுக்கிறீர்கள், இரட்டிப்பாக திரும்பக் கிடைக்கும் என்கிறார், ஆனால் திரும்பக் கிடைத்த பணம் போலியானதாக இருக்கிறது.',
-    options: ['பழைய, தேவையற்ற நோட்டுகளை மட்டும் கொண்டு செய்வது', 'மறுப்பது — எந்த சடங்கும் பணத்தை ஆசீர்வதிக்கவோ இரட்டிப்பாக்கவோ முடியாது, “பரிமாற்றத்திற்காக” உண்மையான பணத்தை கொடுத்தால் முழுவதையும் இழக்க நேரிடும்', 'ஆசி பெற்ற பணத்தை முதலில் வங்கியில் சரிபார்க்கச் சொல்வது', 'உண்மையா என்று சோதிக்க ஒரு முறை சிறிய தொகையுடன் முயற்சிப்பது'],
-    explanation: 'இந்த பரிமாற்ற தந்திரம் “சடங்கின்” போது உங்கள் உண்மையான பணத்தை போலி நோட்டுகளாக மாற்றும் வகையில் வடிவமைக்கப்பட்டுள்ளது. எந்த ஆசியும் பணத்தின் மதிப்பை மாற்றாது — இதுபோன்ற பரிமாற்றத்திற்கு ஒருபோதும் பணத்தை கொடுக்காதீர்கள்.',
-  },
-  'bls-10': {
-    scenario: 'துறவி போல் உடையணிந்த ஒருவர் உங்கள் வீட்டு வாசலில், “பாதுகாப்பிற்காக” ஒரு தாயத்து வளையலைத் தந்து, பதிலுக்கு பெரிய நன்கொடையை வலியுறுத்துகிறார், நீங்கள் ஆர்வமில்லை என்று சொல்ல முயலும்போது கடுமையாகவும் அசௌகரியமாகவும் நடந்துகொள்கிறார்.',
-    options: ['வளையலை வாங்கி, அடுத்த முறை பணம் தருவதாக உறுதியளிப்பது', 'உறுதியாக இல்லை என்று சொல்லி கதவை மூடுவது; அவர் போகவில்லையெனில் அண்டை வீட்டாரையோ பாதுகாவலரையோ அழைப்பது', 'அவரை அனுப்ப, விட்டுக்கொடுத்து பணம் கொடுப்பது', 'உரையாடலை முடிக்க மிகக் குறைந்த தொகையை வழங்குவது'],
-    explanation: 'உண்மையான மத நன்கொடைகள் ஒருபோதும் கட்டாயப்படுத்தப்படாது. நீங்கள் மறுக்கும்போது ஆக்ரோஷமாகவோ வற்புறுத்தலாகவோ நடந்துகொள்வது தானே ஒரு எச்சரிக்கை அறிகுறி — உறுதியாக இருங்கள், தேவைப்பட்டால் உதவி பெறுங்கள்.',
   },
   'luv-01': {
     scenario: 'நீங்கள் ஆன்லைனில் அறிமுகமான ஒருவருடன் இரண்டு மாதங்களாக பேசி வருகிறீர்கள், அவர் தன்னை வெளிநாட்டில் பணிபுரியும் பொறியாளர் என்கிறார். அவர் ஒருபோதும் வீடியோ அழைப்பு செய்ததில்லை, இப்போது சிங்கப்பூர் வந்து உங்களை சந்திக்க “சுங்க கட்டணத்திற்காக” உடனடியாக பணம் தேவை என்கிறார்.',

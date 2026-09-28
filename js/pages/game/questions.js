@@ -1,22 +1,21 @@
 /**
  * Quiz content — Singapore scam scenarios for senior players.
  *
- * 50 questions across 5 scam categories seniors in Singapore are most often
+ * 40 questions across 4 scam categories seniors in Singapore are most often
  * hit by (10 questions each):
  *   impersonation  🎭  bank officer / government official / family member
- *   blessing       🙏  stranger claims to remove a curse or "double your money"
  *   love           💕  online relationship builds over weeks, then asks for money
  *   investment     📈  high returns promised via a "trusted" contact
  *   ecommerce      🛍️  fake or too-good-to-be-true online purchases
  *
  * To add more scenarios later, just push more objects into QUESTIONS below —
- * nothing else needs to change. Keep `category` to one of the five keys
+ * nothing else needs to change. Keep `category` to one of the four keys
  * above so per-category analytics keeps working, and give every new
  * question a unique, permanent `id` (see the note on ids below).
  *
  * Shape:
  *   {
- *     category: 'impersonation' | 'blessing' | 'love' | 'investment' | 'ecommerce',
+ *     category: 'impersonation' | 'love' | 'investment' | 'ecommerce',
  *     id: 'imp-01',              // stable, unique — see below
  *     scenario: 'The situation described to the player',
  *     options: ['choice A', 'choice B', 'choice C', 'choice D'],
@@ -44,13 +43,6 @@ export const CATEGORIES = {
     icon: '/assets/kps/categories/impersonation.png',
     color: '#dbeafe',
     colorDark: '#1d4ed8',
-  },
-  blessing: {
-    label: 'Blessing Scam',
-    emoji: '🙏',
-    icon: null,
-    color: '#ede9fe',
-    colorDark: '#6d28d9',
   },
   love: {
     label: 'Love Scam',
@@ -227,156 +219,6 @@ export const QUESTIONS = [
     correctIndex: 0,
     explanation:
       'Genuine tech companies don’t cold-call about virus alerts. Installing remote-access software for a stranger can let them see everything on your computer, including banking details.',
-  },
-  {
-    category: 'blessing',
-    id: 'bls-01',
-    scenario:
-      'An elderly stranger approaches you and says your family has bad luck because of a curse, and offers to “cleanse” your gold jewellery and cash by praying over them — but you must hand the items over first.',
-    options: [
-      'Agree, but ask them to do the ritual in front of you first',
-      'Hand over the jewellery and cash so the curse can be removed',
-      'Politely decline and walk away — no one can remove a curse by taking your valuables',
-      'Give only the jewellery, keep the cash',
-    ],
-    correctIndex: 2,
-    explanation:
-      'This is a classic blessing scam. Once your valuables leave your hands, they are gone. Genuine religious or spiritual help never requires handing over your cash or jewellery.',
-  },
-  {
-    category: 'blessing',
-    id: 'bls-02',
-    scenario:
-      'A “temple medium” calls and says your health problems are caused by evil spirits. She offers to double your money through a special ritual if you first transfer your savings to her for “blessing”.',
-    options: [
-      'Ask a family member to transfer on your behalf instead',
-      'Hang up — no ritual can double your money, and this is a scam',
-      'Transfer a small amount first to test if it really doubles',
-      'Meet her in person and pay in cash so it feels safer',
-    ],
-    correctIndex: 1,
-    explanation:
-      'No ritual, blessing, or medium can “double” your money. Any request to send money to have it multiplied or blessed is a scam — hang up and do not engage further.',
-  },
-  {
-    category: 'blessing',
-    id: 'bls-03',
-    scenario:
-      'A person dressed as a monk comes to your door collecting donations for a temple, and after praising your generosity and “good fortune”, insists you should give a much larger amount than usual to “match your blessed fate”.',
-    options: [
-      'Give the larger amount since he says you\'re blessed with good fortune',
-      'Give the amount but ask for it back if he can\'t prove he\'s a real monk',
-      'Ask him to come back later with a receipt book before deciding',
-      'Politely decline the extra pressure and only give what you\'re comfortable with, or nothing, to a registered charity instead',
-    ],
-    correctIndex: 3,
-    explanation:
-      'Genuine religious organisations don\'t pressure people into larger donations using flattery. If you want to donate, do so to a registered charity you\'ve verified yourself.',
-  },
-  {
-    category: 'blessing',
-    id: 'bls-04',
-    scenario:
-      'A stranger at the market offers to read your palm for free, then suddenly looks worried and says a serious disaster will happen to your family soon — unless you buy a special protective charm from her right now.',
-    options: [
-      'Buy a cheaper charm just in case it\'s true',
-      'Buy the charm immediately to protect your family',
-      'Ask her to lower the price before buying',
-      'Walk away — this is a common pressure tactic, and a real warning wouldn\'t be sold as a charm',
-    ],
-    correctIndex: 3,
-    explanation:
-      'This is a classic pressure tactic: create fear, then sell a “solution”. No genuine reading predicts disaster that\'s conveniently fixed by buying something on the spot.',
-  },
-  {
-    category: 'blessing',
-    id: 'bls-05',
-    scenario:
-      'At a hawker centre, a woman tells you she can sense that your son is in serious danger, and offers to pray for his safety — but says the prayer only works if you pay her an increasing amount each time you meet.',
-    options: [
-      'Recognise this as a scam preying on your worry for your child, and stop paying and walk away',
-      'Ask her to prove it by calling your son right there',
-      'Keep paying more each time to protect your son',
-      'Pay once more, then stop if nothing changes',
-    ],
-    correctIndex: 0,
-    explanation:
-      'Scammers often target a parent\'s love and worry for their children. Genuine prayer or blessing is never sold with an ever-increasing price tag — walk away.',
-  },
-  {
-    category: 'blessing',
-    id: 'bls-06',
-    scenario:
-      'You get a phone call from someone claiming to represent a temple, saying your ancestors are “unhappy” and causing bad luck in your family, and that a special prayer costing a specific sum of money must be done urgently to fix it.',
-    options: [
-      'Hang up — no legitimate temple calls out of the blue demanding money to “fix” ancestor unhappiness',
-      'Negotiate the price down before paying',
-      'Transfer the money quickly so your ancestors won\'t cause more bad luck',
-      'Ask a family member to verify with the temple directly by calling the number given',
-    ],
-    correctIndex: 0,
-    explanation:
-      'Real temples don\'t cold-call demanding money for ancestor-related prayers. If concerned, visit or call a temple you already know and trust, using a number you look up yourself.',
-  },
-  {
-    category: 'blessing',
-    id: 'bls-07',
-    scenario:
-      'A small group performs a blessing ritual on the street and hands you a red packet, saying you must “return the blessing” with a donation. You give a small amount, but they insist a much larger transfer is needed for the blessing to be “complete”.',
-    options: [
-      'Give a little more, but firmly refuse anything beyond that',
-      'Transfer the larger amount so the blessing isn\'t left incomplete',
-      'Ask them to write down how the money will be used before paying more',
-      'Walk away — a real blessing isn\'t a financial transaction with escalating demands',
-    ],
-    correctIndex: 3,
-    explanation:
-      'Escalating demands after an initial small payment is a common street scam pattern. There\'s no such thing as an “incomplete” blessing that requires more money — walk away.',
-  },
-  {
-    category: 'blessing',
-    id: 'bls-08',
-    scenario:
-      'A self-proclaimed feng shui master offers a free home inspection, then tells you there are bad spirits in your house that can only be removed by purchasing specific expensive items or crystals that he happens to be selling.',
-    options: [
-      'Buy the items he recommends to remove the bad spirits',
-      'Decline — a real feng shui consultation shouldn\'t require buying specific pricey items from the consultant himself',
-      'Ask him to remove the spirits for free since you\'re a senior',
-      'Buy a cheaper version of the item instead',
-    ],
-    correctIndex: 1,
-    explanation:
-      'Be wary whenever the person diagnosing a problem is also the one selling the expensive solution. This conflict of interest is a common way to pressure people into buying unnecessary items.',
-  },
-  {
-    category: 'blessing',
-    id: 'bls-09',
-    scenario:
-      'A caller says your lottery numbers are “cursed” with bad luck and offers to cleanse them through a ritual exchange — you hand over your cash to be “blessed” and get it back doubled, but the money returned turns out to be fake.',
-    options: [
-      'Do it, but only with old, unwanted notes',
-      'Refuse — no ritual can bless or double money, and handing over real cash for an “exchange” risks losing it entirely',
-      'Ask for the blessed money to be checked by a bank first',
-      'Try it once with a small amount to test if it\'s real',
-    ],
-    correctIndex: 1,
-    explanation:
-      'This exchange trick is designed to swap your real money for fake notes during the “ritual”. No blessing changes the value of money — never hand over cash for such an exchange.',
-  },
-  {
-    category: 'blessing',
-    id: 'bls-10',
-    scenario:
-      'A man dressed as a monk at your doorstep offers you a charm bracelet for “protection” and insists on a large donation in return, becoming pushy and uncomfortable when you try to say you\'re not interested.',
-    options: [
-      'Take the bracelet and promise to pay him next time',
-      'Firmly say no and close the door; call a neighbour or security if he won\'t leave',
-      'Give in and pay to make him leave',
-      'Offer a much smaller amount to end the conversation',
-    ],
-    correctIndex: 1,
-    explanation:
-      'Genuine religious donations are never forced. Aggressive or pushy behaviour when you decline is itself a warning sign — stand firm and get help if someone won\'t leave.',
   },
   {
     category: 'love',
@@ -853,8 +695,8 @@ function shuffle(array) {
  *      question pool independently.
  *   2. Walk the shuffled categories in a round: take one not-yet-used
  *      question from each. This guarantees maximum category coverage —
- *      with 5 categories and total=6, all 5 appear at least once.
- *   3. If `total` isn't reached after one round (as with 6 > 5), start a
+ *      with 4 categories and total=6, all 4 appear at least once.
+ *   3. If `total` isn't reached after one round (as with 6 > 4), start a
  *      new round: reshuffle the category order and take one more from
  *      each until `total` is hit. Which category gets the "extra"
  *      question(s) is different every playthrough.
